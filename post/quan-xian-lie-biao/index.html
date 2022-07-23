@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>电商后台管理系统 | 晓云的个人博客</title>
+<title>权限列表 | 晓云的个人博客</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,7 +18,14 @@
 
 
 
-    <meta name="description" content="一点记录">
+    <meta name="description" content="权限管理
+权限管理业务分析：
+通过权限管理模块控制不同的用户可以进行哪些操作，具体可以通过角色的方式进行控制，即每个用户分配特定的角色，角色包括不同的功能权限。
+
+角色列表
+难点1：使用 v-for 循环渲染角色的权限（作用域插槽）
+难点2..." />
+    <meta name="keywords" content="" />
   </head>
   <body>
     <div id="app" class="main">
@@ -88,28 +95,42 @@
 
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
-          <h2 class="current-tag">标签: 电商后台管理系统</h2>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://shangxiaoyun.github.io/post/deng-lu-tui-chu-gong-neng/">
-                  <h2 class="post-title">登录/退出功能</h2>
-                </a>
-                <div class="post-date">
-                  2022-07-23
-                </div>
-                <div class="post-abstract">
-                  
-                </div>
-              </div>
-              
-            </article>
-          
+          <div class="post-detail">
+            <h2 class="post-title">权限列表</h2>
+            <div class="post-date">2022-07-23</div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="权限管理"><strong>权限管理</strong></h2>
+<p>权限管理业务分析：</p>
+<p>通过权限管理模块控制不同的用户可以进行哪些操作，具体可以通过角色的方式进行控制，即每个用户分配特定的角色，角色包括不同的功能权限。</p>
+<figure data-type="image" tabindex="1"><img src="https://shangxiaoyun.github.io/post-images/1658567200989.png" alt="" loading="lazy"></figure>
+<h2 id="角色列表"><strong>角色列表</strong></h2>
+<p><strong>难点1</strong>：使用 v-for 循环渲染角色的权限（作用域插槽）</p>
+<p><strong>难点2</strong>：每次删除一个权限时，将返回的 data 赋值给 role.children ，这里的 role 是 scope.row。而不应该重新执行 getRoleList() 函数，否则列表就会重新刷新渲染一次。展开栏也会合上。<br>
+<img src="https://shangxiaoyun.github.io/post-images/1658567222052.png" alt="" loading="lazy"></p>
+<p><strong>难点3</strong>：改进，当某个二级菜单下已经没有三级菜单时，对应的二级菜单也删除。当某个一级菜单下已经没有二级菜单时，一级菜单也随之删除。</p>
+<p><strong>难点4</strong>：tree结构</p>
+<ul>
+<li>递归获取三级节点的 id 放到 defKeys 数组中，通过 Tree 组件的 :default-checked-keys 属性来表示选中的项。</li>
+<li>通过 Tree 组件 ref 对象的 getCheckedKeys() 和 getHalfCheckedKeys() 方法得到全选和半选中的id数组，最后通过 join() 拼接，得到的信息作为一项参数发送分配权限请求。</li>
+</ul>
 
-          <div class="pagination-container">
-  
-  
-</div>
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://shangxiaoyun.github.io/post/yong-hu-lie-biao/">
+                  <h3 class="post-title">
+                    用户列表
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
 
         </div>
       </div>
