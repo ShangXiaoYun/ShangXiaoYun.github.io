@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://shangxiaoyun.github.io</id>
     <title>晓云的个人博客</title>
-    <updated>2022-07-23T19:04:23.425Z</updated>
+    <updated>2022-07-23T19:06:08.361Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://shangxiaoyun.github.io"/>
     <link rel="self" href="https://shangxiaoyun.github.io/atom.xml"/>
@@ -11,187 +11,11 @@
     <icon>https://shangxiaoyun.github.io/favicon.ico</icon>
     <rights>All rights reserved 2022, 晓云的个人博客</rights>
     <entry>
-        <title type="html"><![CDATA[项目优化&上线]]></title>
-        <id>https://shangxiaoyun.github.io/post/xiang-mu-you-hua-andshang-xian/</id>
-        <link href="https://shangxiaoyun.github.io/post/xiang-mu-you-hua-andshang-xian/">
+        <title type="html"><![CDATA[项目优化 & 上线]]></title>
+        <id>https://shangxiaoyun.github.io/post/xiang-mu-you-hua-and-shang-xian/</id>
+        <link href="https://shangxiaoyun.github.io/post/xiang-mu-you-hua-and-shang-xian/">
         </link>
-        <updated>2022-07-23T18:59:56.000Z</updated>
-        <summary type="html"><![CDATA[<h2 id="项目优化策略"><strong>项目优化策略</strong></h2>
-<p>可以从以下几个方向优化：</p>
-<p>生成打包报告、第三方库启用CDN、Element-UI 组件按需加载、路由懒加载、图片压缩、图片懒加载、Gzip 压缩、首页内容定制等。</p>
-<h3 id="生成打包报告"><strong>生成打包报告</strong></h3>
-<p>便于直观发现项目存在的问题，由于项目使用 vue-cli2 ，此处通过可视化面板（vue ui）查看报告。</p>
-<h3 id="通过externals加载外部cdn资源"><strong>通过externals加载外部CDN资源</strong></h3>
-<p>默认情况下，通过 import 语法导入的第三方依赖包，最终会被打包合并在同一个文件中，从而导致打包成功后，单文件体积过大的问题。为了解决该问题，可以通过 webpack 的 externals 节点，来配置并加载外部的 CDN 资源。凡是声明在 externals 中的第三方依赖包，都不会被打包。</p>
-<p>css开源库：<a href="https://cdnjs.com/">cdnjs - The #1 free and open source CDN built to make life easier for developers</a></p>
-<p>js开源库：<a href="https://www.jsdelivr.com/">jsDelivr - A free, fast, and reliable CDN for open source</a></p>
-<p>首先，在 webpack.prod.conf.js 中的添加代码段：</p>
-<pre><code>externals: {
-    'vue': 'Vue',
-    // 'vue-router': 'VueRouter',
-    'axios': 'axios',
-    'vue-lazyload':'VueLazyload',
-    lodash:'_',
-    echarts:'echarts',
-    nprogress:'NProgress',
-    'vue-quill-editor':'VueQuillEditor',
-    'element-ui': 'ELEMENT'
-}
-</code></pre>
-<p>然后在 index.html 中引入相关资源，资源版本参照 package.json 中的版本。</p>
-<pre><code class="language-html"> &lt;!-- 富文本编辑器样式表 --&gt;
-    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.core.css&quot;&gt;
-    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.css&quot;&gt;
-    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.bubble.css&quot;&gt;
-    &lt;!-- nprogress 进度条样式 --&gt;
-    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.css&quot;&gt;
-    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.15.6/theme-chalk/index.min.css&quot;&gt;
-    &lt;!-- element-ui 样式表 --&gt;
-    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.15.6/theme-chalk/index.min.css&quot;&gt;
-
-    &lt;!-- js 文件 --&gt;
-    &lt;script src=&quot;https://cdn.jsdelivr.net/npm/vue@2.5.2/dist/vue.min.js&quot;&gt;&lt;/script&gt;
-    &lt;!-- &lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/vue-router/2.5.2/vue-router.min.js&quot;&gt;&lt;/script&gt; --&gt;
-    &lt;script src=&quot;https://cdn.jsdelivr.net/npm/axios@0.24.0/dist/axios.min.js&quot;&gt;&lt;/script&gt;
-    &lt;script src=&quot;https://cdn.jsdelivr.net/npm/vue-lazyload@1.3.3/vue-lazyload.min.js&quot;&gt;&lt;/script&gt;
-    &lt;script src=&quot;https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js&quot;&gt;&lt;/script&gt;
-    &lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/echarts/5.3.0/echarts.min.js&quot;&gt;&lt;/script&gt;
-    &lt;script src=&quot;https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js&quot;&gt;&lt;/script&gt;
-    &lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.15.6/index.min.js&quot;&gt;&lt;/script&gt;
-    &lt;script src=&quot;https://cdn.jsdelivr.net/npm/vue-quill-editor@3.0.6/dist/vue-quill-editor.min.js&quot;&gt;&lt;/script&gt;
-</code></pre>
-<p>main.js 中要注释 element-ui 的导入和使用，注释富文本编辑器和进度条的样式导入。</p>
-<p>打包后 vender.js 文件体积显著减小。</p>
-<h3 id="路由懒加载"><strong>路由懒加载</strong></h3>
-<p>当打包构建项目时，JS包会变得很大，影响页面加载。因此把不同路由对应的组件分割成不同的代码块，然后当路由被访问的时候才加载对应组件，更加高效。其中，webpackChunkName  可以把不同的路由打包到一个 js 文件中，相当于路由分组。</p>
-<pre><code class="language-js">const Login = () =&gt; import(/*webpackChunckName:&quot;Login_Home_Welcome&quot;*/'../components/Login.vue')
-const Home = () =&gt; import(/*webpackChunckName:&quot;Login_Home_Welcome&quot;*/'../components/Home.vue')
-const Welcome = () =&gt; import(/*webpackChunckName:&quot;Login_Home_Welcome&quot;*/'../components/Welcome.vue')
-</code></pre>
-<p>打包后，会形成多个 js 文件。</p>
-<h3 id="图片压缩"><strong>图片压缩</strong></h3>
-<p>使用 webpack 打包工具一定少不了一些好用的转换器（loaders）。其中，用于压缩图片的 loader 叫 image-webpack-loader。</p>
-<p>在 webpack.base.conf.js 中设置：</p>
-<pre><code class="language-js">{
-    test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-    use:[
-        //图片压缩
-        {
-            loader: 'image-webpack-loader',
-            options: {
-                disable: process.env.NODE_ENV === 'development', // 开发环境下禁止压缩
-                bypassOnDebug: true,
-                gifsicle: {
-                    interlaced: false
-                }
-            }
-        }
-    ]
-}
-</code></pre>
-<p>但是测试后上述设置对动态图片gif无效。</p>
-<h3 id="图片懒加载"><strong>图片懒加载</strong></h3>
-<ul>
-<li>
-<p>图片延迟加载也称为懒加载，延迟加载图片或符合某些条件时才加载某些图片，通常适用于图片较多的网页，可以减少请求数或延迟请求数，优化性能。它有三种常见的呈现方式：</p>
-<ul>
-<li>
-<p>延迟加载：使用 setTimeout 或 setInterval 进行延迟加载，如果用户在加载前就离开，自然不会进行加载。</p>
-</li>
-<li>
-<p>条件加载：符合某些条件或者触发某些条件才开始异步加载。</p>
-</li>
-<li>
-<p>可视域加载：仅仅加载用户可以看到的区域，主要通过监控滚动条来实现，一般距离用户看到的底边很近的时候加载，这样能保证用户下拉时正好接上，不会有太长时间的停顿。</p>
-<ul>
-<li>
-<p>判断条件：图片距顶部的距离 &lt; 滚动条顶部的距离 + 可视域区域高度</p>
-<ul>
-<li>
-<pre><code class="language-js">var clientHeight = document.documentElement.clientHeight;//  可视域区域高度	
-var scrollTop = document.documentElement.scrollTop;  // 滚动条 top 值
-imgTop = imgArr[i].offsetTop;
-/*...*/
-if(imgTop &lt; scrollTop + clientHeight){
-    var src = imgArr[i].getAttribute(&quot;data-src&quot;);
-	imgArr[i].setAttribute(&quot;src&quot;, src);   
-}
-</code></pre>
-</li>
-</ul>
-</li>
-<li>
-<p>判断时机：滚动的时候加载   window.onscroll</p>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>
-<p>上述方法，在滚动条上下滚动时，懒加载函数会被频繁调用，造成很大的性能损失，因此需要给事件加上节流 throttle。</p>
-<ul>
-<li>
-<pre><code class="language-js">function lazyload(fn, immediate) {
-    let flag = true;
-    return function (...args) {
-        let context = this;
-        if (!flag) return;
-        flag = false;
-        setTimeout(() =&gt; {
-            fn.apply(context, args)
-            flag = true;
-        }, 200)
-    }
-}
-</code></pre>
-</li>
-</ul>
-</li>
-</ul>
-<p>参考博客：<a href="https://blog.csdn.net/darabiuz/article/details/123151266">(18条消息) 图片懒加载的原理--三种方法实现_望屿的博客-CSDN博客_图片懒加载</a></p>
-<h3 id="gzip-压缩"><strong>Gzip 压缩</strong></h3>
-<p>Gzip 压缩使用到 CompressionWebpackPlugin 插件（文本资源压缩插件）。</p>
-<pre><code class="language-js">if (config.build.productionGzip) {
-  const CompressionWebpackPlugin = require('compression-webpack-plugin')
-  webpackConfig.plugins.push(
-    new CompressionWebpackPlugin({
-      asset: '[path].gz[query]',   // 会被替换的原始资源
-      algorithm: 'gzip',
-      //所有匹配该正则的资源都会被处理。默认值是全部资源。
-      test: new RegExp(
-        '\\.(' +
-        config.build.productionGzipExtensions.join('|') +
-        ')$'
-      ),
-      threshold: 10240, //只有大小大于该值的资源会被处理。单位是 bytes。默认值是 0。
-      minRatio: 0.8  //只有压缩率小于这个值的资源才会被处理。默认值是 0.8。
-    })
-  )
-}
-</code></pre>
-<h3 id="压缩代码"><strong>压缩代码</strong></h3>
-<p>ExtractTextPlugin  用于将 css , less 打包成一个公共的文件的插件，这个公共的文件是 styles.css。OptimizeCssAssetsWebpackPlugin  压缩输出的 css 文件。UglifyJSPlugin 插件压缩代码（丑化后已无法阅读）。</p>
-<pre><code class="language-js">new ExtractTextPlugin({
-    filename: utils.assetsPath('css/[name].[contenthash].css'),
-    allChunks: true
-}),
-new OptimizeCSSPlugin({
-    cssProcessorOptions: config.build.productionSourceMap ? {safe: true, map: {inline: false}}: {safe: true}
-}),
-new UglifyJsPlugin({
-    uglifyOptions: {
-        compress: {
-        	warnings: false
-        }
-    },
-    sourceMap: config.build.productionSourceMap,
-    parallel: true
-})
-</code></pre>
-<p>OptimizeCssAssetsWebpackPlugin  还可以参考：<a href="https://blog.csdn.net/u012961419/article/details/107094111">(18条消息) webpack二刷之五、生产环境优化（5.提取压缩CSS）_皮蛋很白的博客-CSDN博客_optimization.minimizer</a></p>
-<h3 id="上述打包结果"><strong>上述打包结果</strong></h3>
-<figure data-type="image" tabindex="1"><img src="https://shangxiaoyun.github.io/post-images/1658602865860.png" alt="" loading="lazy"></figure>
-]]></summary>
+        <updated>2022-07-23T19:04:41.000Z</updated>
         <content type="html"><![CDATA[<h2 id="项目优化策略"><strong>项目优化策略</strong></h2>
 <p>可以从以下几个方向优化：</p>
 <p>生成打包报告、第三方库启用CDN、Element-UI 组件按需加载、路由懒加载、图片压缩、图片懒加载、Gzip 压缩、首页内容定制等。</p>
@@ -366,8 +190,7 @@ new UglifyJsPlugin({
 </code></pre>
 <p>OptimizeCssAssetsWebpackPlugin  还可以参考：<a href="https://blog.csdn.net/u012961419/article/details/107094111">(18条消息) webpack二刷之五、生产环境优化（5.提取压缩CSS）_皮蛋很白的博客-CSDN博客_optimization.minimizer</a></p>
 <h3 id="上述打包结果"><strong>上述打包结果</strong></h3>
-<figure data-type="image" tabindex="1"><img src="https://shangxiaoyun.github.io/post-images/1658602865860.png" alt="" loading="lazy"></figure>
-<!-- more -->
+<figure data-type="image" tabindex="1"><img src="https://shangxiaoyun.github.io/post-images/1658603151637.png" alt="" loading="lazy"></figure>
 <p>vendor.js 第三方库组件打包文件体积明显减小。jpg 图片压缩成功，但 gif 动态图没有压缩。（问题遗留）</p>
 <h2 id="项目上线"><strong>项目上线</strong></h2>
 <ol>
