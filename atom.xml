@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://shangxiaoyun.github.io</id>
     <title>晓云的个人博客</title>
-    <updated>2022-07-23T09:56:48.648Z</updated>
+    <updated>2022-07-23T10:01:20.593Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://shangxiaoyun.github.io"/>
     <link rel="self" href="https://shangxiaoyun.github.io/atom.xml"/>
@@ -10,6 +10,42 @@
     <logo>https://shangxiaoyun.github.io/images/avatar.png</logo>
     <icon>https://shangxiaoyun.github.io/favicon.ico</icon>
     <rights>All rights reserved 2022, 晓云的个人博客</rights>
+    <entry>
+        <title type="html"><![CDATA[订单管理&数据统计]]></title>
+        <id>https://shangxiaoyun.github.io/post/ding-dan-guan-li-andshu-ju-tong-ji/</id>
+        <link href="https://shangxiaoyun.github.io/post/ding-dan-guan-li-andshu-ju-tong-ji/">
+        </link>
+        <updated>2022-07-23T10:00:25.000Z</updated>
+        <content type="html"><![CDATA[<h3 id="订单列表可视化"><strong>订单列表可视化</strong></h3>
+<ul>
+<li>
+<p>搜索框：由于后台没有做模糊匹配，因此前端来完成。</p>
+<pre><code class="language-jsx">this.orderlist = this.orderAll.filter(item =&gt; {
+  return item.order_number.match(info)
+})
+</code></pre>
+</li>
+<li>
+<p>修改地址对话框的省市区/县的选择 将数据由外部 city_data2017_element.js 导入。</p>
+</li>
+<li>
+<p>展开订单详情，由于goods_origin_price 、goodsPic 和  goodsName 异步请求获得，在goodslist 中并没这些属性，因此使用深拷贝，处理后对 goodslist 重新赋值。</p>
+</li>
+</ul>
+<h3 id="数据统计"><strong>数据统计</strong></h3>
+<ul>
+<li>echarts 使用
+<ul>
+<li>导入 echarts</li>
+<li>为 echarts准备一个具备大小（宽高）的 DOM</li>
+<li>在 mounted() 生命函数中，基于准备好的 DOM ，初始化 echarts 实例</li>
+<li>准备数据和配置项</li>
+<li>展示数据</li>
+</ul>
+</li>
+</ul>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[商品管理]]></title>
         <id>https://shangxiaoyun.github.io/post/shang-pin-guan-li/</id>
