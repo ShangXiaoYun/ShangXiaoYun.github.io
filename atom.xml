@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://shangxiaoyun.github.io</id>
     <title>晓云的个人博客</title>
-    <updated>2022-07-23T08:00:50.689Z</updated>
+    <updated>2022-07-23T08:58:42.868Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://shangxiaoyun.github.io"/>
     <link rel="self" href="https://shangxiaoyun.github.io/atom.xml"/>
@@ -10,6 +10,82 @@
     <logo>https://shangxiaoyun.github.io/images/avatar.png</logo>
     <icon>https://shangxiaoyun.github.io/favicon.ico</icon>
     <rights>All rights reserved 2022, 晓云的个人博客</rights>
+    <entry>
+        <title type="html"><![CDATA[用户列表]]></title>
+        <id>https://shangxiaoyun.github.io/post/yong-hu-lie-biao/</id>
+        <link href="https://shangxiaoyun.github.io/post/yong-hu-lie-biao/">
+        </link>
+        <updated>2022-07-23T08:53:15.000Z</updated>
+        <content type="html"><![CDATA[<p>###** 插槽形式的自定义列的渲染**</p>
+<p>操作列包含修改、删除、分配角色三个功能。这些操作都需要获取当前用户id，因此需要使用作用域插槽获取当前行的内容（scope.row）。</p>
+<p>###** 添加用户对话框中渲染一个表单**</p>
+<ul>
+<li>在 Form 组件中，每一个表单域由一个 Form-Item 组件构成，表单域中可以放置各种类型的表单控件，包括 Input、Select、Checkbox、Radio、Switch、DatePicker、TimePicker。</li>
+<li>:model数据绑定，要将数据绑定到一张表单addForm，:rules绑定表单的验证规则，添加表单的验证规则对象addFormRules{}，ref给el-form组件起了一个引用名称：addFormRef。</li>
+<li>el-form中prop对应验证规则的属性。Form 组件提供了表单验证的功能，只需要通过 rules 属性传入约定的验证规则，并将 Form-Item 的 prop 属性设置为需校验的字段名即可。</li>
+</ul>
+<h3 id="实现自定义规则"><strong>实现自定义规则</strong></h3>
+<ul>
+<li>
+<p>一个箭头函数代表一个自定义规则。箭头函数有三个参数：rule,value,callback。rule代表验证规则，value代表需要验证的值，callback为回调函数。只要验证通过了，可以直接在箭头函数中调用callback回调函数，表示验证通过。如果验证失败，则需要返回一个error。</p>
+</li>
+<li>
+<p>在data()中通过 var 定义一个变量来定义校验规则，它的值指向一个箭头函数，箭头函数中包含具体的校验规则（正则表达式），通过test方法来校验是否合法，然后在具体的规则中通过validator指定自定义校验规则，通过trigger指定触发校验的时机。</p>
+<pre><code class="language-js">//验证手机号的规则
+var checkMobile = (rule, value, callback) =&gt; {
+    //验证手机号的正则表达式
+    const regMobile = /^1[3-9][0-9]{9}$/
+    if (regMobile.test(value)) {
+        //合法的手机号
+        return callback()
+    }
+    return callback(new Error('请输入合法的手机号'))
+}
+
+addFormRules: {
+    mobile: [
+        { required: true, message: '请输入手机号', trigger: 'blur' },
+        { validator: checkMobile, trigger: 'blur' }
+    ]
+}
+</code></pre>
+</li>
+</ul>
+<h3 id="添加用户表单的重置功能"><strong>添加用户表单的重置功能</strong></h3>
+<p>给对话框添加一个对话框关闭事件，关闭事件中对用户表单进行重置。通过<code>this.$refs</code>拿到addFormRef（表单引用），然后调用重置方法 <code>this.$refs.addFormRef.resetFields()</code>。</p>
+<h3 id="实现添加用户功能"><strong>实现添加用户功能</strong></h3>
+<p>点击按钮，添加新用户，首先需要进行预验证操作。通过<code>this.$refs.addFormRef</code>拿到表单引用，然后调用validate方法进行校验。函数内部提供一个箭头函数，来接受校验结果valid。</p>
+<p>当预校验通过后可以发起一个添加用户的网络请求。</p>
+<pre><code class="language-js">this.$refs.addFormRef.validate(async value =&gt; {
+    if (!value) return
+    //可以发起添加用户的网络请求
+   	...
+})
+</code></pre>
+<h3 id="实现删除用户的功能"><strong>实现删除用户的功能</strong></h3>
+<p>点击删除按钮时不能立刻删除数据，因为有可能用户误操作，并不是真的想删除数据，所以此处应该有<strong>弹框提醒</strong>。此处用到弹框组件：<strong>MessageBox</strong>。</p>
+<p>调用 <code>$confirm</code> 方法即可打开消息提示，它模拟了系统的  confirm 。Message Box 组件也拥有极高的定制性，我们可以传入options 作为第三个参数，它是一个字面量对象。type 表明消息类型，可以为 success，error ，info 和 warning，无效的设置将会被忽略。注意，第二个参数 title 必须定义为 String 类型，如果是 Object，会被理解为 options。在这里我们用了 Promise 来处理后续响应。通过调用<code>this.$confirm</code>来弹出消息提示框。</p>
+<pre><code class="language-js">async removeUserById(id) {
+    //弹框询问用户是否删除数据
+    const confirmResult = await this.$confirm(
+        '此操作将永久删除该用户, 是否继续?',
+        '提示',
+        {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        }
+    ).catch(err =&gt; err)
+    //如果用户确认删除，则返回值为字符串 confirm
+    //如果用户取消删除，则返回值为字符串 cancel
+    if (confirmResult !== 'confirm') {
+        return this.$message.info('已取消删除')
+    }
+   	// 删除用户...
+}
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[主页]]></title>
         <id>https://shangxiaoyun.github.io/post/zhu-ye/</id>
