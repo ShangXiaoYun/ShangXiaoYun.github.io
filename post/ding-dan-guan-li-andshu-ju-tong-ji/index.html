@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://shangxiaoyun.github.io/favicon.ico?v=1658570552398">
+<link rel="shortcut icon" href="https://shangxiaoyun.github.io/favicon.ico?v=1658578893652">
 <link rel="stylesheet" href="https://shangxiaoyun.github.io/styles/main.css">
 
 
@@ -33,7 +33,7 @@ this.orderlist = this.orderAll.filter(item =&gt; {
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://shangxiaoyun.github.io">
-        <img src="https://shangxiaoyun.github.io/images/avatar.png?v=1658570552398" class="site-logo">
+        <img src="https://shangxiaoyun.github.io/images/avatar.png?v=1658578893652" class="site-logo">
         <h1 class="site-title">晓云的个人博客</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -106,7 +106,28 @@ this.orderlist = this.orderAll.filter(item =&gt; {
 <p>修改地址对话框的省市区/县的级联选择器：将数据由外部 city_data2017_element.js 导入。</p>
 </li>
 <li>
-<p>展开订单详情，由于goods_origin_price 、goodsPic 和  goodsName 异步请求获得，在goodslist 中并没这些属性，因此使用深拷贝，处理后对 goodslist 重新赋值。</p>
+<p>展开订单详情，由于goods_origin_price 、goodsPic 和  goodsName 是异步请求获得，因此可视化时 goodslist 中并没这些属性，这里使用深拷贝，将处理后、拥有上述属性的arr 对 goodslist 重新赋值。</p>
+<pre><code class="language-jsx">let goods_price_sum ,goods_origin_price = 0
+let goodsName ,goodsPic= ''
+let arr = _.cloneDeep(this.goodslist)
+arr.forEach(async item =&gt; {
+    goods_price_sum = item.goods_number * item.goods_price
+    Object.assign(item,{goods_price_sum:goods_price_sum})
+    const {data:res} = await this.$http.get(`goods/${item.goods_id}`)
+    if(res.meta.status !== 200) return this.$message.error('获取商品信息失败！')
+    goodsName = res.data.goods_name 
+    Object.assign(item,{goodsName:goodsName})
+    goods_origin_price = res.data.goods_price
+    Object.assign(item,{goods_origin_price:goods_origin_price})
+    goodsPic = res.data.pics[0].pics_sma_url
+    Object.assign(item,{goodsPic:goodsPic})
+}) 
+
+setTimeout(() =&gt; {
+    this.goodslist = arr;
+    console.log(this.goodslist);
+},500)
+</code></pre>
 </li>
 </ul>
 <h3 id="数据统计"><strong>数据统计</strong></h3>
