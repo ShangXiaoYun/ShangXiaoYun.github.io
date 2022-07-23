@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>主页 | 晓云的个人博客</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://shangxiaoyun.github.io/favicon.ico?v=1658563177601">
+<link rel="stylesheet" href="https://shangxiaoyun.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="通过接口获取菜单数据
+
+
+API接口文档中提到：
+
+除了登录接口，其余的接口必须要授权才能调用
+因此，需要授权的API，必须在请求头中使用Authorization字段提供token令牌
+
+
+
+如何在每一个API的请求头中添加Authori..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://shangxiaoyun.github.io">
+        <img src="https://shangxiaoyun.github.io/images/avatar.png?v=1658563177601" class="site-logo">
+        <h1 class="site-title">晓云的个人博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      一点记录
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://shangxiaoyun.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">主页</h2>
+            <div class="post-date">2022-07-23</div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="通过接口获取菜单数据"><strong>通过接口获取菜单数据</strong></h2>
+<ul>
+<li>
+<p>API接口文档中提到：</p>
+<ul>
+<li>除了登录接口，其余的接口必须要授权才能调用</li>
+<li>因此，需要授权的API，必须在请求头中使用Authorization字段提供token令牌</li>
+</ul>
+</li>
+<li>
+<p>如何在每一个API的请求头中添加Authorization字段？</p>
+<ul>
+<li>通过axios请求拦截器添加token，保证拥有获取数据的权限。</li>
+<li>请求之前会先做一个预处理，返回config（为请求头对象挂载一个属性，值为保存在sessionStorage中的token值）</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-jsx">//axios请求拦截
+axios.interceptors.request.use(config =&gt; {
+  //为请求头对象，添加Token 验证的Authorization字段
+  console.log(config)
+  config.headers.Authorization = window.sessionStorage.getItem('token')
+  //在最后必须返回预处理结果
+  return config
+})
+</code></pre>
+<h2 id="发起请求获取左侧菜单数据"><strong>发起请求获取左侧菜单数据</strong></h2>
+<ul>
+<li>在Home页面被创建时，就应该获取菜单数据并附到左侧菜单框，因此created()生命钩子中调用this.getMenuList()</li>
+<li>模板区通过指令v-for循环赋值，每个v-for循环需要一个唯一的key值，通常用id</li>
+<li>el-submenu也需要唯一的一个index，否则相同的index会在一次展开时同时展开。通常也用index。注意此处index只接收字符串。</li>
+<li>一级菜单的index由item.id动态绑定，key也由item.id动态绑定，不同的是，前者需要拼接‘ ’来转换成字符串。</li>
+<li>二级菜单循环一级菜单的children属性，<strong>二级菜单的index由路由路径动态绑定</strong>，key仍然由item.id动态绑定。</li>
+</ul>
+<h2 id="实现首页的路由重定向"><strong>实现首页的路由重定向</strong></h2>
+<p>只要登录成功，我们默认访问/home，但是此时我们需要重定向到welcome地址，在主体区域展示Welcome组件。首先定义一个Welcome组件，然后在home页面主体区域放置一个路由占位符。然后将welcome路由设置为home理由的子路由规则，即可在home组件嵌套显示一个welcome的子组件。</p>
+<h2 id="左侧菜单改造为路由链接"><strong>左侧菜单改造为路由链接</strong></h2>
+<p>点击二级菜单时，跳转到对应的页面，因此二级菜单绑定单击响应事件。</p>
+<p>element-ui的NavMenu的属性中，有一项router，描述为：</p>
+<p>是否使用 vue-router 的模式，启用该模式会在激活导航时以 index 作为 path 进行路由跳转，类型为布尔值，默认为false。 :router=&quot;true&quot;表示为整个侧边栏开启路由模式。拿id作为跳转地址并不是很合适，最好是拿二级菜单的path属性作为跳转路径。</p>
+<h2 id="高亮效果"><strong>高亮效果</strong></h2>
+<p>NavMenu中的属性default-active说明：当前激活菜单的 index，类型为string。</p>
+<p>点击链接的时候把对应的path值（index）保存到sessionStorage中<br>
+当下一次刷新页面的时候，也就是home组件刚被创建的时候，就立即把值取出来，赋值给左侧菜单<br>
+给二级菜单绑定一个单击响应事件: 保存链接的激活状态</p>
+<pre><code class="language-jsx">saveNavState(activePath) {
+	window.sessionStorage.setItem('activePath', activePath)
+	this.activePath = activePath
+}
+</code></pre>
+<pre><code class="language-jsx">created() {
+    this.getMenuList()
+    this.activePath = window.sessionStorage.getItem('activePath')
+}
+</code></pre>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://shangxiaoyun.github.io/post/deng-lu-tui-chu-gong-neng/">
+                  <h3 class="post-title">
+                    登录/退出功能
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+
+
+  </body>
+</html>
