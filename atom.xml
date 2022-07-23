@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://shangxiaoyun.github.io</id>
     <title>晓云的个人博客</title>
-    <updated>2022-07-23T10:01:20.593Z</updated>
+    <updated>2022-07-23T10:02:35.775Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://shangxiaoyun.github.io"/>
     <link rel="self" href="https://shangxiaoyun.github.io/atom.xml"/>
@@ -26,7 +26,7 @@
 </code></pre>
 </li>
 <li>
-<p>修改地址对话框的省市区/县的选择 将数据由外部 city_data2017_element.js 导入。</p>
+<p>修改地址对话框的省市区/县的级联选择器：将数据由外部 city_data2017_element.js 导入。</p>
 </li>
 <li>
 <p>展开订单详情，由于goods_origin_price 、goodsPic 和  goodsName 异步请求获得，在goodslist 中并没这些属性，因此使用深拷贝，处理后对 goodslist 重新赋值。</p>
