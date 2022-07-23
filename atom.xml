@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://shangxiaoyun.github.io</id>
     <title>晓云的个人博客</title>
-    <updated>2022-07-23T17:32:55.415Z</updated>
+    <updated>2022-07-23T17:35:30.195Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://shangxiaoyun.github.io"/>
     <link rel="self" href="https://shangxiaoyun.github.io/atom.xml"/>
@@ -55,27 +55,6 @@
     timer = setTimeout(function() {
       fn.apply(context, args);
     }, delay);
-  }
-}
-</code></pre>
-<h2 id="双剑合璧加强版节流"><strong>双剑合璧——加强版节流</strong></h2>
-<p>现在我们可以把<code>防抖</code>和<code>节流</code>放到一起，为什么呢？因为防抖有时候触发的太频繁会导致一次响应都没有，我们希望到了固定的时间必须给用户一个响应，事实上很多前端库就是采取了这样的思路。</p>
-<pre><code>function throttle(fn, delay) {
-  let last = 0, timer = null;
-  return function (...args) {
-    let context = this;
-    let now = new Date();
-    if(now - last &gt; delay){
-      clearTimeout(timer);
-      setTimeout(function() {
-        last = now;
-        fn.apply(context, args);
-      }, delay);
-    } else {
-      // 这个时候表示时间到了，必须给响应
-      last = now;
-      fn.apply(context, args);
-    }
   }
 }
 </code></pre>
