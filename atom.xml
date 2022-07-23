@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://shangxiaoyun.github.io</id>
     <title>晓云的个人博客</title>
-    <updated>2022-07-23T12:21:36.808Z</updated>
+    <updated>2022-07-23T17:32:55.415Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://shangxiaoyun.github.io"/>
     <link rel="self" href="https://shangxiaoyun.github.io/atom.xml"/>
@@ -10,6 +10,77 @@
     <logo>https://shangxiaoyun.github.io/images/avatar.png</logo>
     <icon>https://shangxiaoyun.github.io/favicon.ico</icon>
     <rights>All rights reserved 2022, 晓云的个人博客</rights>
+    <entry>
+        <title type="html"><![CDATA[事件的防抖和节流]]></title>
+        <id>https://shangxiaoyun.github.io/post/shi-jian-de-fang-dou-he-jie-liu/</id>
+        <link href="https://shangxiaoyun.github.io/post/shi-jian-de-fang-dou-he-jie-liu/">
+        </link>
+        <updated>2022-07-23T17:25:39.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="节流"><strong>节流</strong></h2>
+<p>节流的核心思想: 如果在定时器的时间范围内再次触发，则不予理睬，等当前定时器完成，才能启动<strong>下一个定时器任务</strong>。这就好比公交车，10 分钟一趟，无论乘客多少都不会改变。也可以理解为水管隔固定时间滴一滴水。<strong>节流可以连续触发</strong>。</p>
+<p>代码如下:</p>
+<pre><code>function throttle(fn, interval) {
+  let flag = true;
+  return funtion(...args) {
+    let context = this;
+    if (!flag) return;
+    flag = false;
+    setTimeout(() =&gt; {
+      fn.apply(context, args);
+      flag = true;
+    }, interval);
+  };
+};
+</code></pre>
+<p>写成下面的方式也是表达一样的意思:</p>
+<pre><code>const throttle = function(fn, interval) {
+  let last = 0;
+  return function (...args) {
+    let context = this;
+    let now = +new Date();
+    // 还没到时间
+    if(now - last &lt; interval) return;
+    last = now;
+    fn.apply(this, args)
+  }
+}
+</code></pre>
+<h2 id="防抖"><strong>防抖</strong></h2>
+<p>核心思想: 每次事件触发则删除原来的定时器，建立新的定时器。你反复触发功能，那么只认最后一次，从最后一次触发开始计时。</p>
+<pre><code>function debounce(fn, delay) {
+  let timer = null;
+  return function (...args) {
+    let context = this;
+    if(timer) clearTimeout(timer);
+    timer = setTimeout(function() {
+      fn.apply(context, args);
+    }, delay);
+  }
+}
+</code></pre>
+<h2 id="双剑合璧加强版节流"><strong>双剑合璧——加强版节流</strong></h2>
+<p>现在我们可以把<code>防抖</code>和<code>节流</code>放到一起，为什么呢？因为防抖有时候触发的太频繁会导致一次响应都没有，我们希望到了固定的时间必须给用户一个响应，事实上很多前端库就是采取了这样的思路。</p>
+<pre><code>function throttle(fn, delay) {
+  let last = 0, timer = null;
+  return function (...args) {
+    let context = this;
+    let now = new Date();
+    if(now - last &gt; delay){
+      clearTimeout(timer);
+      setTimeout(function() {
+        last = now;
+        fn.apply(context, args);
+      }, delay);
+    } else {
+      // 这个时候表示时间到了，必须给响应
+      last = now;
+      fn.apply(context, args);
+    }
+  }
+}
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[订单管理&数据统计]]></title>
         <id>https://shangxiaoyun.github.io/post/ding-dan-guan-li-andshu-ju-tong-ji/</id>

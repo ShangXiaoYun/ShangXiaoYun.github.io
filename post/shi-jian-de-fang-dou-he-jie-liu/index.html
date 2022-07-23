@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>事件的防抖和节流 | 晓云的个人博客</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://shangxiaoyun.github.io/favicon.ico?v=1658597571731">
+<link rel="stylesheet" href="https://shangxiaoyun.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="节流
+节流的核心思想: 如果在定时器的时间范围内再次触发，则不予理睬，等当前定时器完成，才能启动下一个定时器任务。这就好比公交车，10 分钟一趟，无论乘客多少都不会改变。也可以理解为水管隔固定时间滴一滴水。节流可以连续触发。
+代码如下:
+f..." />
+    <meta name="keywords" content="前端性能相关" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://shangxiaoyun.github.io">
+        <img src="https://shangxiaoyun.github.io/images/avatar.png?v=1658597571731" class="site-logo">
+        <h1 class="site-title">晓云的个人博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      一点记录
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://shangxiaoyun.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">事件的防抖和节流</h2>
+            <div class="post-date">2022-07-24</div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="节流"><strong>节流</strong></h2>
+<p>节流的核心思想: 如果在定时器的时间范围内再次触发，则不予理睬，等当前定时器完成，才能启动<strong>下一个定时器任务</strong>。这就好比公交车，10 分钟一趟，无论乘客多少都不会改变。也可以理解为水管隔固定时间滴一滴水。<strong>节流可以连续触发</strong>。</p>
+<p>代码如下:</p>
+<pre><code>function throttle(fn, interval) {
+  let flag = true;
+  return funtion(...args) {
+    let context = this;
+    if (!flag) return;
+    flag = false;
+    setTimeout(() =&gt; {
+      fn.apply(context, args);
+      flag = true;
+    }, interval);
+  };
+};
+</code></pre>
+<p>写成下面的方式也是表达一样的意思:</p>
+<pre><code>const throttle = function(fn, interval) {
+  let last = 0;
+  return function (...args) {
+    let context = this;
+    let now = +new Date();
+    // 还没到时间
+    if(now - last &lt; interval) return;
+    last = now;
+    fn.apply(this, args)
+  }
+}
+</code></pre>
+<h2 id="防抖"><strong>防抖</strong></h2>
+<p>核心思想: 每次事件触发则删除原来的定时器，建立新的定时器。你反复触发功能，那么只认最后一次，从最后一次触发开始计时。</p>
+<pre><code>function debounce(fn, delay) {
+  let timer = null;
+  return function (...args) {
+    let context = this;
+    if(timer) clearTimeout(timer);
+    timer = setTimeout(function() {
+      fn.apply(context, args);
+    }, delay);
+  }
+}
+</code></pre>
+<h2 id="双剑合璧加强版节流"><strong>双剑合璧——加强版节流</strong></h2>
+<p>现在我们可以把<code>防抖</code>和<code>节流</code>放到一起，为什么呢？因为防抖有时候触发的太频繁会导致一次响应都没有，我们希望到了固定的时间必须给用户一个响应，事实上很多前端库就是采取了这样的思路。</p>
+<pre><code>function throttle(fn, delay) {
+  let last = 0, timer = null;
+  return function (...args) {
+    let context = this;
+    let now = new Date();
+    if(now - last &gt; delay){
+      clearTimeout(timer);
+      setTimeout(function() {
+        last = now;
+        fn.apply(context, args);
+      }, delay);
+    } else {
+      // 这个时候表示时间到了，必须给响应
+      last = now;
+      fn.apply(context, args);
+    }
+  }
+}
+</code></pre>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://shangxiaoyun.github.io/tag/8GNwgrS36/" class="tag">
+                    前端性能相关
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://shangxiaoyun.github.io/post/ding-dan-guan-li-andshu-ju-tong-ji/">
+                  <h3 class="post-title">
+                    订单管理&amp;数据统计
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+
+
+  </body>
+</html>
