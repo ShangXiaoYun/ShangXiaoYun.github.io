@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>登录/退出功能 | 晓云的个人博客</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://shangxiaoyun.github.io/favicon.ico?v=1658562334457">
+<link rel="stylesheet" href="https://shangxiaoyun.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="登录业务流程
+登录业务流程
+1.在登录页面输入用户名和密码
+2.调用后台接口进行验证
+3.通过验证后，根据后台的响应状态跳转到项目主页
+登录业务的相关技术点
+
+
+登录业务的相关技术点
+
+http是无状态的
+通过cookie在客户端记录状态
+..." />
+    <meta name="keywords" content="电商后台管理系统" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://shangxiaoyun.github.io">
+        <img src="https://shangxiaoyun.github.io/images/avatar.png?v=1658562334457" class="site-logo">
+        <h1 class="site-title">晓云的个人博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      一点记录
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://shangxiaoyun.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">登录/退出功能</h2>
+            <div class="post-date">2022-07-23</div>
+            
+            <div class="post-content" v-pre>
+              <h1 id="登录业务流程">登录业务流程</h1>
+<p>登录业务流程</p>
+<p>1.在登录页面输入用户名和密码</p>
+<p>2.调用后台接口进行验证</p>
+<p>3.通过验证后，根据后台的响应状态跳转到项目主页</p>
+<h1 id="登录业务的相关技术点">登录业务的相关技术点</h1>
+<ul>
+<li>
+<p>登录业务的相关技术点</p>
+<ul>
+<li>http是无状态的</li>
+<li>通过cookie在客户端记录状态</li>
+<li>通过session在服务器端记录状态</li>
+<li>通过token方式维持状态</li>
+</ul>
+<p><strong>如果客户端和服务器存在跨域问题：token</strong></p>
+<p><strong>如果客户端和服务器不存在跨域问题：cookie+session</strong></p>
+</li>
+<li>
+<p>登录——token原理</p>
+</li>
+</ul>
+<figure data-type="image" tabindex="1"><img src="https://shangxiaoyun.github.io/post-images/1658562040637.png" alt="" loading="lazy"></figure>
+<h2 id="登录表单">登录表单</h2>
+<ul>
+<li>登录表单绑定数据对象，里面的内容和输入双向绑定（:model  v-model）</li>
+<li>增加表单验证规则(:rules prop)</li>
+<li>表单添加ref属性，通过this.$refs拿到表单引用，调用重置和登陆验证函数(resetFields()  validate())</li>
+<li>验证成功→配置axios和请求根路径，发起ajax请求  (this.$http)</li>
+<li>post结果是一个promise，用async await优化</li>
+</ul>
+<h2 id="登录成功以后">登录成功以后</h2>
+<ul>
+<li>1.将登陆成功之后的token保存到客户端的sessionStoreage中
+<ul>
+<li>1.1 项目中除了登陆以外的其他api接口（有权限的接口） ，必须在登陆以后才能访问</li>
+<li>1.2 token只应在当前网站打开期间生效，所以将token保存到<strong>sessionStoreage</strong>（会话期间存储机制，区别于localStoreage持久化的存储机制）中</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-jsx">window.sessionStorage.setItem('token', res.data.token)
+</code></pre>
+<ul>
+<li>2. 通过<strong>编程式导航</strong>跳转到后台主页，路由地址是/home</li>
+</ul>
+<pre><code class="language-jsx">this.$router.push(&quot;/home&quot;);
+</code></pre>
+<h3 id="用路由导航守卫控制导航权限">用路由导航守卫控制导航权限</h3>
+<p>如果用户没有登录，但通过url访问特定页面，需要重新导航到登录页面</p>
+<pre><code class="language-jsx">//挂载路由导航守卫
+router.beforeEach((to, from, next) =&gt; {
+  //to 将要访问的路径
+  //from 代表从哪个路径跳转而来
+  //next 是一个函数，表示放行
+  // next()  放行    next('/login)    强制跳转
+
+  if (to.path === '/login') return next();
+  //获取token
+  const tokenStr = window.sessionStorage.getItem('token');
+  if (!tokenStr) return next('/login');
+  next();
+})
+</code></pre>
+<h2 id="退出"><strong>退出</strong></h2>
+<p>消除本地token</p>
+<pre><code class="language-jsx">window.sessionStorage.clear()
+</code></pre>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://shangxiaoyun.github.io/tag/RjiWSehJ7/" class="tag">
+                    电商后台管理系统
+                  </a>
+                
+              </div>
+            
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+
+
+  </body>
+</html>

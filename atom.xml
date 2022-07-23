@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://shangxiaoyun.github.io</id>
     <title>晓云的个人博客</title>
-    <updated>2022-07-23T07:01:34.534Z</updated>
+    <updated>2022-07-23T07:46:10.743Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://shangxiaoyun.github.io"/>
     <link rel="self" href="https://shangxiaoyun.github.io/atom.xml"/>
@@ -10,4 +10,79 @@
     <logo>https://shangxiaoyun.github.io/images/avatar.png</logo>
     <icon>https://shangxiaoyun.github.io/favicon.ico</icon>
     <rights>All rights reserved 2022, 晓云的个人博客</rights>
+    <entry>
+        <title type="html"><![CDATA[登录/退出功能]]></title>
+        <id>https://shangxiaoyun.github.io/post/deng-lu-tui-chu-gong-neng/</id>
+        <link href="https://shangxiaoyun.github.io/post/deng-lu-tui-chu-gong-neng/">
+        </link>
+        <updated>2022-07-23T07:03:12.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="登录业务流程">登录业务流程</h1>
+<p>登录业务流程</p>
+<p>1.在登录页面输入用户名和密码</p>
+<p>2.调用后台接口进行验证</p>
+<p>3.通过验证后，根据后台的响应状态跳转到项目主页</p>
+<h1 id="登录业务的相关技术点">登录业务的相关技术点</h1>
+<ul>
+<li>
+<p>登录业务的相关技术点</p>
+<ul>
+<li>http是无状态的</li>
+<li>通过cookie在客户端记录状态</li>
+<li>通过session在服务器端记录状态</li>
+<li>通过token方式维持状态</li>
+</ul>
+<p><strong>如果客户端和服务器存在跨域问题：token</strong></p>
+<p><strong>如果客户端和服务器不存在跨域问题：cookie+session</strong></p>
+</li>
+<li>
+<p>登录——token原理</p>
+</li>
+</ul>
+<figure data-type="image" tabindex="1"><img src="https://shangxiaoyun.github.io/post-images/1658562040637.png" alt="" loading="lazy"></figure>
+<h2 id="登录表单">登录表单</h2>
+<ul>
+<li>登录表单绑定数据对象，里面的内容和输入双向绑定（:model  v-model）</li>
+<li>增加表单验证规则(:rules prop)</li>
+<li>表单添加ref属性，通过this.$refs拿到表单引用，调用重置和登陆验证函数(resetFields()  validate())</li>
+<li>验证成功→配置axios和请求根路径，发起ajax请求  (this.$http)</li>
+<li>post结果是一个promise，用async await优化</li>
+</ul>
+<h2 id="登录成功以后">登录成功以后</h2>
+<ul>
+<li>1.将登陆成功之后的token保存到客户端的sessionStoreage中
+<ul>
+<li>1.1 项目中除了登陆以外的其他api接口（有权限的接口） ，必须在登陆以后才能访问</li>
+<li>1.2 token只应在当前网站打开期间生效，所以将token保存到<strong>sessionStoreage</strong>（会话期间存储机制，区别于localStoreage持久化的存储机制）中</li>
+</ul>
+</li>
+</ul>
+<pre><code class="language-jsx">window.sessionStorage.setItem('token', res.data.token)
+</code></pre>
+<ul>
+<li>2. 通过<strong>编程式导航</strong>跳转到后台主页，路由地址是/home</li>
+</ul>
+<pre><code class="language-jsx">this.$router.push(&quot;/home&quot;);
+</code></pre>
+<h3 id="用路由导航守卫控制导航权限">用路由导航守卫控制导航权限</h3>
+<p>如果用户没有登录，但通过url访问特定页面，需要重新导航到登录页面</p>
+<pre><code class="language-jsx">//挂载路由导航守卫
+router.beforeEach((to, from, next) =&gt; {
+  //to 将要访问的路径
+  //from 代表从哪个路径跳转而来
+  //next 是一个函数，表示放行
+  // next()  放行    next('/login)    强制跳转
+
+  if (to.path === '/login') return next();
+  //获取token
+  const tokenStr = window.sessionStorage.getItem('token');
+  if (!tokenStr) return next('/login');
+  next();
+})
+</code></pre>
+<h2 id="退出"><strong>退出</strong></h2>
+<p>消除本地token</p>
+<pre><code class="language-jsx">window.sessionStorage.clear()
+</code></pre>
+]]></content>
+    </entry>
 </feed>
