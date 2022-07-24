@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://shangxiaoyun.github.io</id>
     <title>晓云的个人博客</title>
-    <updated>2022-07-23T19:06:08.361Z</updated>
+    <updated>2022-07-24T00:59:22.692Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://shangxiaoyun.github.io"/>
     <link rel="self" href="https://shangxiaoyun.github.io/atom.xml"/>
@@ -11,7 +11,7 @@
     <icon>https://shangxiaoyun.github.io/favicon.ico</icon>
     <rights>All rights reserved 2022, 晓云的个人博客</rights>
     <entry>
-        <title type="html"><![CDATA[项目优化 & 上线]]></title>
+        <title type="html"><![CDATA[项目优化]]></title>
         <id>https://shangxiaoyun.github.io/post/xiang-mu-you-hua-and-shang-xian/</id>
         <link href="https://shangxiaoyun.github.io/post/xiang-mu-you-hua-and-shang-xian/">
         </link>
@@ -192,7 +192,7 @@ new UglifyJsPlugin({
 <h3 id="上述打包结果"><strong>上述打包结果</strong></h3>
 <figure data-type="image" tabindex="1"><img src="https://shangxiaoyun.github.io/post-images/1658603151637.png" alt="" loading="lazy"></figure>
 <p>vendor.js 第三方库组件打包文件体积明显减小。jpg 图片压缩成功，但 gif 动态图没有压缩。（问题遗留）</p>
-<h2 id="项目上线"><strong>项目上线</strong></h2>
+<h2 id="创建-web-服务器"><strong>创建 web 服务器</strong></h2>
 <ol>
 <li>
 <p>初始化package.json     <code>npm init -y</code></p>
