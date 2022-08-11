@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://shangxiaoyun.github.io</id>
     <title>晓云的个人博客</title>
-    <updated>2022-08-11T19:45:03.510Z</updated>
+    <updated>2022-08-11T19:47:10.498Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://shangxiaoyun.github.io"/>
     <link rel="self" href="https://shangxiaoyun.github.io/atom.xml"/>
@@ -81,17 +81,6 @@
 <figure data-type="image" tabindex="2"><img src="https://shangxiaoyun.github.io/post-images/1660235131531.png" alt="" loading="lazy"></figure>
 <p>​        上面说到的三种展示地图的形式：3D, 2D, 2.5D，点击画面右上角的镂空网格球就可以切换。我展示的都是3D形式，可以通过滚轮缩小画面变换成球，也可以由其他形式转成 3D。2D是平面不多赘述，2.5D 也成为哥伦布视图，在 2D 的基础上有倾斜状态。</p>
 <p>​         看到了展示的效果，很多人会疑问有啥用？主要还是为了展示，但可以和城市建设、模拟沙盘、灾害分析、应急测绘…挂钩，毕竟采集的三维模型自带地理信息。</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[js继承的7种方式]]></title>
-        <id>https://shangxiaoyun.github.io/post/js-ji-cheng-de-6-chong-fang-shi/</id>
-        <link href="https://shangxiaoyun.github.io/post/js-ji-cheng-de-6-chong-fang-shi/">
-        </link>
-        <updated>2022-07-26T09:28:40.000Z</updated>
-        <content type="html"><![CDATA[<p>参考文章：https://www.cnblogs.com/wrhbk/p/14477637.html<br>
-https://blog.csdn.net/zhishiqu/article/details/108484245<br>
-参考视频：https://www.bilibili.com/video/BV1YY4y1W7Uj/?spm_id_from=333.788&amp;vd_source=1abeefe13381c97e3a10c86d239b6aa4</p>
 ]]></content>
     </entry>
     <entry>
@@ -420,6 +409,28 @@ form.goods_cat = form.goods_cat.join(',')
 })
 </code></pre>
 </li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[权限列表]]></title>
+        <id>https://shangxiaoyun.github.io/post/quan-xian-lie-biao/</id>
+        <link href="https://shangxiaoyun.github.io/post/quan-xian-lie-biao/">
+        </link>
+        <updated>2022-07-23T09:06:17.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="权限管理"><strong>权限管理</strong></h2>
+<p>权限管理业务分析：</p>
+<p>通过权限管理模块控制不同的用户可以进行哪些操作，具体可以通过角色的方式进行控制，即每个用户分配特定的角色，角色包括不同的功能权限。</p>
+<figure data-type="image" tabindex="1"><img src="https://shangxiaoyun.github.io/post-images/1658567200989.png" alt="" loading="lazy"></figure>
+<h2 id="角色列表"><strong>角色列表</strong></h2>
+<p><strong>难点1</strong>：使用 v-for 循环渲染角色的权限（作用域插槽）</p>
+<p><strong>难点2</strong>：每次删除一个权限时，将返回的 data 赋值给 role.children ，这里的 role 是 scope.row。而不应该重新执行 getRoleList() 函数，否则列表就会重新刷新渲染一次。展开栏也会合上。<br>
+<img src="https://shangxiaoyun.github.io/post-images/1658567222052.png" alt="" loading="lazy"></p>
+<p><strong>难点3</strong>：改进，当某个二级菜单下已经没有三级菜单时，对应的二级菜单也删除。当某个一级菜单下已经没有二级菜单时，一级菜单也随之删除。</p>
+<p><strong>难点4</strong>：tree结构</p>
+<ul>
+<li>递归获取三级节点的 id 放到 defKeys 数组中，通过 Tree 组件的 :default-checked-keys 属性来表示选中的项。</li>
+<li>通过 Tree 组件 ref 对象的 getCheckedKeys() 和 getHalfCheckedKeys() 方法得到全选和半选中的id数组，最后通过 join() 拼接，得到的信息作为一项参数发送分配权限请求。</li>
 </ul>
 ]]></content>
     </entry>
