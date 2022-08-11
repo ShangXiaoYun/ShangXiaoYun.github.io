@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://shangxiaoyun.github.io/favicon.ico?v=1660141148251">
+<link rel="shortcut icon" href="https://shangxiaoyun.github.io/favicon.ico?v=1660244802604">
 <link rel="stylesheet" href="https://shangxiaoyun.github.io/styles/main.css">
 
 
@@ -37,7 +37,7 @@
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://shangxiaoyun.github.io">
-        <img src="https://shangxiaoyun.github.io/images/avatar.png?v=1660141148251" class="site-logo">
+        <img src="https://shangxiaoyun.github.io/images/avatar.png?v=1660244802604" class="site-logo">
         <h1 class="site-title">晓云的个人博客</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -135,7 +135,6 @@ form.goods_cat = form.goods_cat.join(',')
 <p>编辑商品信息</p>
 <ul>
 <li>商品分类通过下拉菜单选择，但是看不见原始分类，因此考虑用 Tag 标签可视化出来（这里后端接口有一个错误：如果只设置到二级分类，那么三级分类会被上一次的三级分类代替），因此我们规定所有商品都有三级分类，添加商品时设置。</li>
-<li>由于下拉菜单中是商品全部分类，因此要调用 this.getCateList() 函数，这个函数在多个组件中都是用了，我们考虑用 Vuex 进行管理 （可改进）</li>
 <li>尝试把根据 id 获取商品信息和商品分类提出来，但是都出错了，主要是异步请求的问题。</li>
 </ul>
 </li>

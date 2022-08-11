@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://shangxiaoyun.github.io/favicon.ico?v=1660141148251">
+<link rel="shortcut icon" href="https://shangxiaoyun.github.io/favicon.ico?v=1660244802604">
 <link rel="stylesheet" href="https://shangxiaoyun.github.io/styles/main.css">
 
 
@@ -18,8 +18,7 @@
 
 
 
-    <meta name="description" content="1
-" />
+    <meta name="description" content="地理信息系统（Geographic Information System, GIS）是20世纪60年代中期发展起来的新技术，是对地球表面空间信息进行采集、处理、存储、查询、分析和显示的计算机系统，是以计算机图形图像处理、数据库技术、测绘遥感..." />
     <meta name="keywords" content="Cesium相关" />
   </head>
   <body>
@@ -29,7 +28,7 @@
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://shangxiaoyun.github.io">
-        <img src="https://shangxiaoyun.github.io/images/avatar.png?v=1660141148251" class="site-logo">
+        <img src="https://shangxiaoyun.github.io/images/avatar.png?v=1660244802604" class="site-logo">
         <h1 class="site-title">晓云的个人博客</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -89,7 +88,17 @@
             <div class="post-date">2022-08-02</div>
             
             <div class="post-content" v-pre>
-              <p>1</p>
+              <p>地理信息系统（Geographic Information System, GIS）是20世纪60年代中期发展起来的新技术，是对地球表面空间信息进行采集、处理、存储、查询、分析和显示的计算机系统，是以计算机图形图像处理、数据库技术、测绘遥感技术及现代数学研究方法为基础，集空间数据和属性数据于一体的综合空间信息系统。</p>
+<p>​        而三维地理信息系统（3D Geographic Information System, 3D GIS）又是 GIS 中的一个重要分支，它以立体构造技术给用户展现地理空间现象，能够表达空间对象间的三维空间关系，并对对象进行三维空间分析和操作。该应用已经深入到社会的各行各业中，如城市管理、工业仿真、基础建设等。</p>
+<p>​        随着 Web 技术和 WebGL 技术的发展，三维 WebGIS 的研发逐渐走向成熟，国内外涌现出大量虚拟地球平台，国外有 Google Earth 、 ArcGIS 、Cesium 等，国内有 SuperMap 、EV-Globe 等。其中 CesiumJS 项目由 AGI 公司于 2011 年创建，是一个使用 js 编写的基于 WebGL 的地图引擎，它支持 3D, 2D, 2.5D 形式的地图展示，支持显示海量三维模型数据、影像数据、地形数据、矢量数据等。</p>
+<p>​        说到 Cesium 的三维模型可视化，不得不提到 AGI 公司于 2015 年 6 月定制的一套用于流式传输海量三维地理空间数据集的开放规范 3dtiles，关于规范的描述可以上 github Cesium 团队的3d-tiles 仓库学习，网上也有很多pdf 的翻译版，但是具体参数的含义还是需要拿三维数据在 Cesium 中可视化，进入源码中调试，才能有更深的体会。本人也由于对 transform 和 gltfUpAxis 理解不深遇到过问题。回到这个规范，它包含多种类型的三维地理空间内容，如倾斜摄影模型、BIM 建筑模型、人工模型、海量点云、矢量数据等，将这些多源异构三维空间数据转化为三维瓦片（3dtiles）格式，就可以高效地进行数据可视化与数据分析。换句话说，只要按照 3dtiles 规范组织三维数据，哪怕它们的采集方式、数据类型不同，都可以可视化，这种开源开放且稳定灵活的数据格式受到许多研究者的推崇，去年11月，Cesium 团队提出了3dtiles next，即1.1版本，这个版本扩展了许多新功能，但当时许多功能还未完全实现，只是将思想呈现在草案中。</p>
+<p>​       在 3dtiles next 中，提出了“隐式切片”（Implicit Tiling）的概念，它将瓦片的空间范围和空间索引方式“隐去”，即不显式地记录在瓦片对象中，而这种隐含的空间分割方法和索引方式，则是默认数据生产者和运行时知道的。我们可以理解为空间分割和瓦片索引方法全部都固定了，也就是说与二维地图、三维地形类似，可以针对全球划分网格、层级、经度，具体可以用 level /x / y.b3dm 来命名瓦片。这样的好处可想而知：（1） 能有效地减少 tileset.json 索引文件的体积，并提高了空间索引的效率，寻找、遍历瓦片的速度更快，射线计算、随机访问、空间查询也更快。（2）由于瓦片按照统一标准分割好，那不同版本的数据块可以很方便迭代替换，而不用担心数据块格式不同、范围有交集，还需要对模型进行切割或压平等复杂操作来实现目的。其实统一标准很多人都想做，但一直没有相关进展，就我去年研究的情况，3D Tiles 1.1 的数据生产工具仍然未实现，Cesium 团队也没有公开处理后可供实验的数据，甚至源码中支持的内容还不完整，在许多讨论中，也有大佬提出了许多需要处理的瓶颈，因此我对可视化效率优化的工作还是针对 1.0 版本进行。但是我们可以期待 Cesium 迎来又一次高峰。</p>
+<p>​        说了这么多，我们来看看最后三维倾斜模型在 Cesium 呈现的效果是什么样的，这里我选取处理的香港三维倾斜模型来展示。</p>
+<figure data-type="image" tabindex="1"><img src="https://shangxiaoyun.github.io/post-images/1660235123003.png" alt="" loading="lazy"></figure>
+<p>​        上面一张俯视图，滚动鼠标可以做到画面缩放，同时带动相机视角远离或靠近模型。还可以将键盘Ctrl键和鼠标左键结合将相机视角拉平。下面用实验中长沙岳麓区的一小片数据来展示另外的视角画面。</p>
+<figure data-type="image" tabindex="2"><img src="https://shangxiaoyun.github.io/post-images/1660235131531.png" alt="" loading="lazy"></figure>
+<p>​        上面说到的三种展示地图的形式：3D, 2D, 2.5D，点击画面右上角的镂空网格球就可以切换。我展示的都是3D形式，可以通过滚轮缩小画面变换成球，也可以由其他形式转成 3D。2D是平面不多赘述，2.5D 也成为哥伦布视图，在 2D 的基础上有倾斜状态。</p>
+<p>​         看到了展示的效果，很多人会疑问有啥用？主要还是为了展示，但可以和城市建设、模拟沙盘、灾害分析、应急测绘…挂钩，毕竟采集的三维模型自带地理信息。</p>
 
             </div>
             

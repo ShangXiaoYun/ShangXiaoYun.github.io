@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Cesium 渲染优化方法 | 晓云的个人博客</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://shangxiaoyun.github.io/favicon.ico?v=1660244802604">
+<link rel="stylesheet" href="https://shangxiaoyun.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="基于 Cesium 的三维倾斜摄影模型可视化的优化可以从两大方面进行：数据组织调度优化和渲染优化。结合论文和相关博客并结合，在渲染优化方面，针对性能瓶颈：（1）CPU：过多的 Draw Calls （渲染命令）传给GPU意味着每次都要重新准..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://shangxiaoyun.github.io">
+        <img src="https://shangxiaoyun.github.io/images/avatar.png?v=1660244802604" class="site-logo">
+        <h1 class="site-title">晓云的个人博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      一点记录
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://shangxiaoyun.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">Cesium 渲染优化方法</h2>
+            <div class="post-date">2022-08-12</div>
+            
+            <div class="post-content" v-pre>
+              <p>基于 Cesium 的三维倾斜摄影模型可视化的优化可以从两大方面进行：数据组织调度优化和渲染优化。结合论文和相关博客并结合，在渲染优化方面，针对性能瓶颈：（1）CPU：过多的 Draw Calls （渲染命令）传给GPU意味着每次都要重新准备顶点数据、重新设置 shader，耗时耗力；（2）顶点处理：过多的顶点；（3）像素(Fragment)处理：过多的像素，对屏幕上的像素绘制多次(overdraws)；（4）带宽：尺寸很大且未压缩的纹理，分辨率过高的frameBuffer。</p>
+<p>那与之相对的优化技术如下：（1）CPU：减少 Draw Calls （方法：批处理）（2）顶点优化：优化几何体，在Cesium中采用的是 LOD (Level of Detail) 技术和遮挡剔除(Occlusion culling)技术。（3）像素优化方面，Cesium 中采用了控制绘制顺序，用pass 通道定制了9 个优先级，透明物体在非透明物体后绘制，排第8 级，覆盖物体排第 9 级。除了控制绘制顺序，还可以减少实时光照来达到优化的目的。（4）带宽优化：减少纹理大小（纹理压缩）等。</p>
+<p>以上参考了Unity 的优化技术，在 Cesium 中或多或少有所体现。针对批处理，3dtiles 规范支持 i3dm 格式的模型，它就是解决种类少、个数多的模型进行高效组织，例如路灯、电塔、井盖、垃圾桶等城市管理的附属物。相当于用同一个模型放置在画面的不同位置（通过matrix转换），但只调用一次DrawCall。i3dm 格式针对静态物体。针对动目标，比如航行的飞机。Cesium 中的未公开函数<strong><strong>ModelInstanceCollection()</strong></strong> 可以实现。</p>
+<p>根据沙盒的示例做实验，10000架飞机实例化与10000架飞机逐个绘制对比，对比结果如下图。</p>
+<figure data-type="image" tabindex="1"><img src="https://shangxiaoyun.github.io/post-images/1660241302166.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="2"><img src="https://shangxiaoyun.github.io/post-images/1660241310476.png" alt="" loading="lazy"></figure>
+<p>这样看来这个函数也实现了模型实例化功能，并对渲染性能有一个很大的提升，尤其是对于显卡性能稳定的机器（官方论坛有人做过测试）FPS可以达到25Hz以上，人眼感觉不出卡顿，画面流畅，并且性能差不多提升了3倍。</p>
+<p>但是想一下，它们都是无论是静态物体树、路灯，还是动态物体的飞机、船舶，刨除它们的几何结构一致，它们的材质/纹理也是完全相同的。也符合了Unity /UE 中批处理的前提是使用同一个材质。但想想，航班系统，显示来自各家公司的飞机，它们可能来自同一种机型，但是每家航空公司的标志不同，全部贴在飞机上，纹理就各不相同了，如果不能使用批处理，那性能压力一下就上来了。再想想建筑房屋，在城市中不可能所有的房屋长一个样子，因此也无法以一个模型代替所有，但是房屋大多都是对称的，对于同一栋房屋或者同一个小区的房屋，它们总有纹理相同的地方，或许可以把相同的纹理提取出来渲染到把多个房屋骨架上，也就是纹理合并。查询后 Unity 本身是支持纹理合并的，但是到Cesium 上，它对于纹理合并完全不支持。甚至说它的实例化也是不完美的，当我给飞机设定路线让它们全部移动后，这些飞机诡异地抖动了，官方至今没有给出解答。</p>
+<p>好吧，综上，虽然纹理合并很有前景，但对于入门的我来说过于困难，如果有大佬感兴趣的话，可以在这一方面开拓，我没有翻阅到相关论文，在论坛虽然看到了类似想法的帖子，但是始终没有后续。</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://shangxiaoyun.github.io/post/cesium-jie-shao/">
+                  <h3 class="post-title">
+                    Cesium 介绍
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+
+
+  </body>
+</html>

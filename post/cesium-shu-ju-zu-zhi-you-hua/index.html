@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>js继承的7种方式 | 晓云的个人博客</title>
+<title>Cesium 数据组织优化 | 晓云的个人博客</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,10 +18,9 @@
 
 
 
-    <meta name="description" content="参考文章：https://www.cnblogs.com/wrhbk/p/14477637.html
-https://blog.csdn.net/zhishiqu/article/details/108484245
-参考视频：https:/..." />
-    <meta name="keywords" content="js" />
+    <meta name="description" content="上一篇作为一个初学者总结了一些渲染优化的技术和一点想法。这一篇与我的研究方向相关。由于集中做实验还没有整理发论文和专利，因此只简单分析一下存在的问题，展示一下改进后的效果。尘埃落定后会公开方法和代码到 github 上。
+实验中主要涉及两个..." />
+    <meta name="keywords" content="Cesium相关" />
   </head>
   <body>
     <div id="app" class="main">
@@ -86,20 +85,22 @@ https://blog.csdn.net/zhishiqu/article/details/108484245
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
           <div class="post-detail">
-            <h2 class="post-title">js继承的7种方式</h2>
-            <div class="post-date">2022-07-26</div>
+            <h2 class="post-title">Cesium 数据组织优化</h2>
+            <div class="post-date">2022-08-12</div>
             
             <div class="post-content" v-pre>
-              <p>参考文章：https://www.cnblogs.com/wrhbk/p/14477637.html<br>
-https://blog.csdn.net/zhishiqu/article/details/108484245<br>
-参考视频：https://www.bilibili.com/video/BV1YY4y1W7Uj/?spm_id_from=333.788&amp;vd_source=1abeefe13381c97e3a10c86d239b6aa4</p>
+              <p>上一篇作为一个初学者总结了一些渲染优化的技术和一点想法。这一篇与我的研究方向相关。由于集中做实验还没有整理发论文和专利，因此只简单分析一下存在的问题，展示一下改进后的效果。尘埃落定后会公开方法和代码到 github 上。</p>
+<p>实验中主要涉及两个比较大的数据（不含调研、分析的数据集），一份是全长沙的数据，来自教研室，由于买的已经是最终的b3dm数据，因此只能在索引文件上做文章。第二份香港数据来自公开数据集，2017年3月及2018年3月由香港规划署制作，覆盖香港岛和九龙半岛部分（超过500G）。链接我会附在文末。这里要注意了，一定不要直接下b3dm 数据集，无论在 Cesium 还是 UE 上都不能正常显示，Cesium 直接加载不出来，UE 上模型没有纹理。排除 gltf 版本问题，Cesium 上改过无效。正解是下载 osgb格式，然后再转化成b3dm格式，涉及到两个工具。由于两块数据格式不同，其中一块组合成一个tileset，可以使用CesiumLab处理，还有一块每个tile作为一个 tileset，总共有超过1000个tileset，那这时候就去github 上找b3dm-tool工具，配置后再处理。具体方法另外分享，也踩了不少坑。确实很难理解为什么要这么生产数据，平白多了那么多步骤。</p>
+<p>数据组织优化这一块需要了解 3dtiles 规范，对多种数据格式进行分析。此外还需要了解 LOD 金字塔格式。后面会一一填坑。</p>
+<p>针对多批次数据同时加载速度缓慢的问题，将单颗瓦片树的单层网格索引重构为四叉树索引，提升加载效率，将遍历并选择待请求瓦片阶段的速率提升 28.36%。</p>
+<p>效果视频如下（上述测试是分开测试，取多次实验结果，此处是一起开，仅看先后状态，不纠结具体数值提升）：https://www.bilibili.com/video/bv1hg411k7wP?vd_source=1abeefe13381c97e3a10c86d239b6aa4</p>
 
             </div>
             
               <div class="tag-container">
                 
-                  <a href="https://shangxiaoyun.github.io/tag/e249d7mAT/" class="tag">
-                    js
+                  <a href="https://shangxiaoyun.github.io/tag/fMQOCu-uZ/" class="tag">
+                    Cesium相关
                   </a>
                 
               </div>
@@ -107,9 +108,9 @@ https://blog.csdn.net/zhishiqu/article/details/108484245<br>
             
               <div class="next-post">
                 <div class="next">下一篇</div>
-                <a href="https://shangxiaoyun.github.io/post/xiang-mu-you-hua-and-shang-xian/">
+                <a href="https://shangxiaoyun.github.io/post/cesium-xuan-ran-you-hua-fang-fa/">
                   <h3 class="post-title">
-                    项目优化
+                    Cesium 渲染优化方法
                   </h3>
                 </a>
               </div>

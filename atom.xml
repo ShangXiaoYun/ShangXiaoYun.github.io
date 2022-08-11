@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://shangxiaoyun.github.io</id>
     <title>晓云的个人博客</title>
-    <updated>2022-08-10T15:22:18.219Z</updated>
+    <updated>2022-08-11T19:06:46.610Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://shangxiaoyun.github.io"/>
     <link rel="self" href="https://shangxiaoyun.github.io/atom.xml"/>
@@ -11,12 +11,52 @@
     <icon>https://shangxiaoyun.github.io/favicon.ico</icon>
     <rights>All rights reserved 2022, 晓云的个人博客</rights>
     <entry>
+        <title type="html"><![CDATA[Cesium 数据组织优化]]></title>
+        <id>https://shangxiaoyun.github.io/post/cesium-shu-ju-zu-zhi-you-hua/</id>
+        <link href="https://shangxiaoyun.github.io/post/cesium-shu-ju-zu-zhi-you-hua/">
+        </link>
+        <updated>2022-08-11T18:38:14.000Z</updated>
+        <content type="html"><![CDATA[<p>上一篇作为一个初学者总结了一些渲染优化的技术和一点想法。这一篇与我的研究方向相关。由于集中做实验还没有整理发论文和专利，因此只简单分析一下存在的问题，展示一下改进后的效果。尘埃落定后会公开方法和代码到 github 上。</p>
+<p>实验中主要涉及两个比较大的数据（不含调研、分析的数据集），一份是全长沙的数据，来自教研室，由于买的已经是最终的b3dm数据，因此只能在索引文件上做文章。第二份香港数据来自公开数据集，2017年3月及2018年3月由香港规划署制作，覆盖香港岛和九龙半岛部分（超过500G）。链接我会附在文末。这里要注意了，一定不要直接下b3dm 数据集，无论在 Cesium 还是 UE 上都不能正常显示，Cesium 直接加载不出来，UE 上模型没有纹理。排除 gltf 版本问题，Cesium 上改过无效。正解是下载 osgb格式，然后再转化成b3dm格式，涉及到两个工具。由于两块数据格式不同，其中一块组合成一个tileset，可以使用CesiumLab处理，还有一块每个tile作为一个 tileset，总共有超过1000个tileset，那这时候就去github 上找b3dm-tool工具，配置后再处理。具体方法另外分享，也踩了不少坑。确实很难理解为什么要这么生产数据，平白多了那么多步骤。</p>
+<p>数据组织优化这一块需要了解 3dtiles 规范，对多种数据格式进行分析。此外还需要了解 LOD 金字塔格式。后面会一一填坑。</p>
+<p>针对多批次数据同时加载速度缓慢的问题，将单颗瓦片树的单层网格索引重构为四叉树索引，提升加载效率，将遍历并选择待请求瓦片阶段的速率提升 28.36%。</p>
+<p>效果视频如下（上述测试是分开测试，取多次实验结果，此处是一起开，仅看先后状态，不纠结具体数值提升）：https://www.bilibili.com/video/bv1hg411k7wP?vd_source=1abeefe13381c97e3a10c86d239b6aa4</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Cesium 渲染优化方法]]></title>
+        <id>https://shangxiaoyun.github.io/post/cesium-xuan-ran-you-hua-fang-fa/</id>
+        <link href="https://shangxiaoyun.github.io/post/cesium-xuan-ran-you-hua-fang-fa/">
+        </link>
+        <updated>2022-08-11T18:07:45.000Z</updated>
+        <content type="html"><![CDATA[<p>基于 Cesium 的三维倾斜摄影模型可视化的优化可以从两大方面进行：数据组织调度优化和渲染优化。结合论文和相关博客并结合，在渲染优化方面，针对性能瓶颈：（1）CPU：过多的 Draw Calls （渲染命令）传给GPU意味着每次都要重新准备顶点数据、重新设置 shader，耗时耗力；（2）顶点处理：过多的顶点；（3）像素(Fragment)处理：过多的像素，对屏幕上的像素绘制多次(overdraws)；（4）带宽：尺寸很大且未压缩的纹理，分辨率过高的frameBuffer。</p>
+<p>那与之相对的优化技术如下：（1）CPU：减少 Draw Calls （方法：批处理）（2）顶点优化：优化几何体，在Cesium中采用的是 LOD (Level of Detail) 技术和遮挡剔除(Occlusion culling)技术。（3）像素优化方面，Cesium 中采用了控制绘制顺序，用pass 通道定制了9 个优先级，透明物体在非透明物体后绘制，排第8 级，覆盖物体排第 9 级。除了控制绘制顺序，还可以减少实时光照来达到优化的目的。（4）带宽优化：减少纹理大小（纹理压缩）等。</p>
+<p>以上参考了Unity 的优化技术，在 Cesium 中或多或少有所体现。针对批处理，3dtiles 规范支持 i3dm 格式的模型，它就是解决种类少、个数多的模型进行高效组织，例如路灯、电塔、井盖、垃圾桶等城市管理的附属物。相当于用同一个模型放置在画面的不同位置（通过matrix转换），但只调用一次DrawCall。i3dm 格式针对静态物体。针对动目标，比如航行的飞机。Cesium 中的未公开函数<strong><strong>ModelInstanceCollection()</strong></strong> 可以实现。</p>
+<p>根据沙盒的示例做实验，10000架飞机实例化与10000架飞机逐个绘制对比，对比结果如下图。</p>
+<figure data-type="image" tabindex="1"><img src="https://shangxiaoyun.github.io/post-images/1660241302166.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="2"><img src="https://shangxiaoyun.github.io/post-images/1660241310476.png" alt="" loading="lazy"></figure>
+<p>这样看来这个函数也实现了模型实例化功能，并对渲染性能有一个很大的提升，尤其是对于显卡性能稳定的机器（官方论坛有人做过测试）FPS可以达到25Hz以上，人眼感觉不出卡顿，画面流畅，并且性能差不多提升了3倍。</p>
+<p>但是想一下，它们都是无论是静态物体树、路灯，还是动态物体的飞机、船舶，刨除它们的几何结构一致，它们的材质/纹理也是完全相同的。也符合了Unity /UE 中批处理的前提是使用同一个材质。但想想，航班系统，显示来自各家公司的飞机，它们可能来自同一种机型，但是每家航空公司的标志不同，全部贴在飞机上，纹理就各不相同了，如果不能使用批处理，那性能压力一下就上来了。再想想建筑房屋，在城市中不可能所有的房屋长一个样子，因此也无法以一个模型代替所有，但是房屋大多都是对称的，对于同一栋房屋或者同一个小区的房屋，它们总有纹理相同的地方，或许可以把相同的纹理提取出来渲染到把多个房屋骨架上，也就是纹理合并。查询后 Unity 本身是支持纹理合并的，但是到Cesium 上，它对于纹理合并完全不支持。甚至说它的实例化也是不完美的，当我给飞机设定路线让它们全部移动后，这些飞机诡异地抖动了，官方至今没有给出解答。</p>
+<p>好吧，综上，虽然纹理合并很有前景，但对于入门的我来说过于困难，如果有大佬感兴趣的话，可以在这一方面开拓，我没有翻阅到相关论文，在论坛虽然看到了类似想法的帖子，但是始终没有后续。</p>
+]]></content>
+    </entry>
+    <entry>
         <title type="html"><![CDATA[Cesium 介绍]]></title>
         <id>https://shangxiaoyun.github.io/post/cesium-jie-shao/</id>
         <link href="https://shangxiaoyun.github.io/post/cesium-jie-shao/">
         </link>
         <updated>2022-08-02T06:46:25.000Z</updated>
-        <content type="html"><![CDATA[<p>1</p>
+        <content type="html"><![CDATA[<p>地理信息系统（Geographic Information System, GIS）是20世纪60年代中期发展起来的新技术，是对地球表面空间信息进行采集、处理、存储、查询、分析和显示的计算机系统，是以计算机图形图像处理、数据库技术、测绘遥感技术及现代数学研究方法为基础，集空间数据和属性数据于一体的综合空间信息系统。</p>
+<p>​        而三维地理信息系统（3D Geographic Information System, 3D GIS）又是 GIS 中的一个重要分支，它以立体构造技术给用户展现地理空间现象，能够表达空间对象间的三维空间关系，并对对象进行三维空间分析和操作。该应用已经深入到社会的各行各业中，如城市管理、工业仿真、基础建设等。</p>
+<p>​        随着 Web 技术和 WebGL 技术的发展，三维 WebGIS 的研发逐渐走向成熟，国内外涌现出大量虚拟地球平台，国外有 Google Earth 、 ArcGIS 、Cesium 等，国内有 SuperMap 、EV-Globe 等。其中 CesiumJS 项目由 AGI 公司于 2011 年创建，是一个使用 js 编写的基于 WebGL 的地图引擎，它支持 3D, 2D, 2.5D 形式的地图展示，支持显示海量三维模型数据、影像数据、地形数据、矢量数据等。</p>
+<p>​        说到 Cesium 的三维模型可视化，不得不提到 AGI 公司于 2015 年 6 月定制的一套用于流式传输海量三维地理空间数据集的开放规范 3dtiles，关于规范的描述可以上 github Cesium 团队的3d-tiles 仓库学习，网上也有很多pdf 的翻译版，但是具体参数的含义还是需要拿三维数据在 Cesium 中可视化，进入源码中调试，才能有更深的体会。本人也由于对 transform 和 gltfUpAxis 理解不深遇到过问题。回到这个规范，它包含多种类型的三维地理空间内容，如倾斜摄影模型、BIM 建筑模型、人工模型、海量点云、矢量数据等，将这些多源异构三维空间数据转化为三维瓦片（3dtiles）格式，就可以高效地进行数据可视化与数据分析。换句话说，只要按照 3dtiles 规范组织三维数据，哪怕它们的采集方式、数据类型不同，都可以可视化，这种开源开放且稳定灵活的数据格式受到许多研究者的推崇，去年11月，Cesium 团队提出了3dtiles next，即1.1版本，这个版本扩展了许多新功能，但当时许多功能还未完全实现，只是将思想呈现在草案中。</p>
+<p>​       在 3dtiles next 中，提出了“隐式切片”（Implicit Tiling）的概念，它将瓦片的空间范围和空间索引方式“隐去”，即不显式地记录在瓦片对象中，而这种隐含的空间分割方法和索引方式，则是默认数据生产者和运行时知道的。我们可以理解为空间分割和瓦片索引方法全部都固定了，也就是说与二维地图、三维地形类似，可以针对全球划分网格、层级、经度，具体可以用 level /x / y.b3dm 来命名瓦片。这样的好处可想而知：（1） 能有效地减少 tileset.json 索引文件的体积，并提高了空间索引的效率，寻找、遍历瓦片的速度更快，射线计算、随机访问、空间查询也更快。（2）由于瓦片按照统一标准分割好，那不同版本的数据块可以很方便迭代替换，而不用担心数据块格式不同、范围有交集，还需要对模型进行切割或压平等复杂操作来实现目的。其实统一标准很多人都想做，但一直没有相关进展，就我去年研究的情况，3D Tiles 1.1 的数据生产工具仍然未实现，Cesium 团队也没有公开处理后可供实验的数据，甚至源码中支持的内容还不完整，在许多讨论中，也有大佬提出了许多需要处理的瓶颈，因此我对可视化效率优化的工作还是针对 1.0 版本进行。但是我们可以期待 Cesium 迎来又一次高峰。</p>
+<p>​        说了这么多，我们来看看最后三维倾斜模型在 Cesium 呈现的效果是什么样的，这里我选取处理的香港三维倾斜模型来展示。</p>
+<figure data-type="image" tabindex="1"><img src="https://shangxiaoyun.github.io/post-images/1660235123003.png" alt="" loading="lazy"></figure>
+<p>​        上面一张俯视图，滚动鼠标可以做到画面缩放，同时带动相机视角远离或靠近模型。还可以将键盘Ctrl键和鼠标左键结合将相机视角拉平。下面用实验中长沙岳麓区的一小片数据来展示另外的视角画面。</p>
+<figure data-type="image" tabindex="2"><img src="https://shangxiaoyun.github.io/post-images/1660235131531.png" alt="" loading="lazy"></figure>
+<p>​        上面说到的三种展示地图的形式：3D, 2D, 2.5D，点击画面右上角的镂空网格球就可以切换。我展示的都是3D形式，可以通过滚轮缩小画面变换成球，也可以由其他形式转成 3D。2D是平面不多赘述，2.5D 也成为哥伦布视图，在 2D 的基础上有倾斜状态。</p>
+<p>​         看到了展示的效果，很多人会疑问有啥用？主要还是为了展示，但可以和城市建设、模拟沙盘、灾害分析、应急测绘…挂钩，毕竟采集的三维模型自带地理信息。</p>
 ]]></content>
     </entry>
     <entry>
@@ -38,7 +78,7 @@ https://blog.csdn.net/zhishiqu/article/details/108484245<br>
         <updated>2022-07-23T19:04:41.000Z</updated>
         <content type="html"><![CDATA[<h2 id="项目优化策略"><strong>项目优化策略</strong></h2>
 <p>可以从以下几个方向优化：</p>
-<p>生成打包报告、第三方库启用CDN、Element-UI 组件按需加载、路由懒加载、图片压缩、图片懒加载、Gzip 压缩、首页内容定制等。</p>
+<p>生成打包报告、第三方库启用CDN、Element-UI 组件按需加载、路由懒加载、图片压缩、Gzip 压缩、首页内容定制等。</p>
 <h3 id="生成打包报告"><strong>生成打包报告</strong></h3>
 <p>便于直观发现项目存在的问题，由于项目使用 vue-cli2 ，此处通过可视化面板（vue ui）查看报告。</p>
 <h3 id="通过externals加载外部cdn资源"><strong>通过externals加载外部CDN资源</strong></h3>
@@ -110,65 +150,6 @@ const Welcome = () =&gt; import(/*webpackChunckName:&quot;Login_Home_Welcome&quo
 }
 </code></pre>
 <p>但是测试后上述设置对动态图片gif无效。</p>
-<h3 id="图片懒加载"><strong>图片懒加载</strong></h3>
-<ul>
-<li>
-<p>图片延迟加载也称为懒加载，延迟加载图片或符合某些条件时才加载某些图片，通常适用于图片较多的网页，可以减少请求数或延迟请求数，优化性能。它有三种常见的呈现方式：</p>
-<ul>
-<li>
-<p>延迟加载：使用 setTimeout 或 setInterval 进行延迟加载，如果用户在加载前就离开，自然不会进行加载。</p>
-</li>
-<li>
-<p>条件加载：符合某些条件或者触发某些条件才开始异步加载。</p>
-</li>
-<li>
-<p>可视域加载：仅仅加载用户可以看到的区域，主要通过监控滚动条来实现，一般距离用户看到的底边很近的时候加载，这样能保证用户下拉时正好接上，不会有太长时间的停顿。</p>
-<ul>
-<li>
-<p>判断条件：图片距顶部的距离 &lt; 滚动条顶部的距离 + 可视域区域高度</p>
-<ul>
-<li>
-<pre><code class="language-js">var clientHeight = document.documentElement.clientHeight;//  可视域区域高度	
-var scrollTop = document.documentElement.scrollTop;  // 滚动条 top 值
-imgTop = imgArr[i].offsetTop;
-/*...*/
-if(imgTop &lt; scrollTop + clientHeight){
-    var src = imgArr[i].getAttribute(&quot;data-src&quot;);
-	imgArr[i].setAttribute(&quot;src&quot;, src);   
-}
-</code></pre>
-</li>
-</ul>
-</li>
-<li>
-<p>判断时机：滚动的时候加载   window.onscroll</p>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>
-<p>上述方法，在滚动条上下滚动时，懒加载函数会被频繁调用，造成很大的性能损失，因此需要给事件加上节流 throttle。</p>
-<ul>
-<li>
-<pre><code class="language-js">function lazyload(fn, immediate) {
-    let flag = true;
-    return function (...args) {
-        let context = this;
-        if (!flag) return;
-        flag = false;
-        setTimeout(() =&gt; {
-            fn.apply(context, args)
-            flag = true;
-        }, 200)
-    }
-}
-</code></pre>
-</li>
-</ul>
-</li>
-</ul>
-<p>参考博客：<a href="https://blog.csdn.net/darabiuz/article/details/123151266">(18条消息) 图片懒加载的原理--三种方法实现_望屿的博客-CSDN博客_图片懒加载</a></p>
 <h3 id="gzip-压缩"><strong>Gzip 压缩</strong></h3>
 <p>Gzip 压缩使用到 CompressionWebpackPlugin 插件（文本资源压缩插件）。</p>
 <pre><code class="language-js">if (config.build.productionGzip) {
@@ -393,7 +374,6 @@ form.goods_cat = form.goods_cat.join(',')
 <p>编辑商品信息</p>
 <ul>
 <li>商品分类通过下拉菜单选择，但是看不见原始分类，因此考虑用 Tag 标签可视化出来（这里后端接口有一个错误：如果只设置到二级分类，那么三级分类会被上一次的三级分类代替），因此我们规定所有商品都有三级分类，添加商品时设置。</li>
-<li>由于下拉菜单中是商品全部分类，因此要调用 this.getCateList() 函数，这个函数在多个组件中都是用了，我们考虑用 Vuex 进行管理 （可改进）</li>
 <li>尝试把根据 id 获取商品信息和商品分类提出来，但是都出错了，主要是异步请求的问题。</li>
 </ul>
 </li>
@@ -514,144 +494,6 @@ addFormRules: {
     }
    	// 删除用户...
 }
-</code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[主页]]></title>
-        <id>https://shangxiaoyun.github.io/post/zhu-ye/</id>
-        <link href="https://shangxiaoyun.github.io/post/zhu-ye/">
-        </link>
-        <updated>2022-07-23T07:56:24.000Z</updated>
-        <content type="html"><![CDATA[<h2 id="通过接口获取菜单数据"><strong>通过接口获取菜单数据</strong></h2>
-<ul>
-<li>
-<p>API接口文档中提到：</p>
-<ul>
-<li>除了登录接口，其余的接口必须要授权才能调用</li>
-<li>因此，需要授权的API，必须在请求头中使用Authorization字段提供token令牌</li>
-</ul>
-</li>
-<li>
-<p>如何在每一个API的请求头中添加Authorization字段？</p>
-<ul>
-<li>通过axios请求拦截器添加token，保证拥有获取数据的权限。</li>
-<li>请求之前会先做一个预处理，返回config（为请求头对象挂载一个属性，值为保存在sessionStorage中的token值）</li>
-</ul>
-</li>
-</ul>
-<pre><code class="language-jsx">//axios请求拦截
-axios.interceptors.request.use(config =&gt; {
-  //为请求头对象，添加Token 验证的Authorization字段
-  console.log(config)
-  config.headers.Authorization = window.sessionStorage.getItem('token')
-  //在最后必须返回预处理结果
-  return config
-})
-</code></pre>
-<h2 id="发起请求获取左侧菜单数据"><strong>发起请求获取左侧菜单数据</strong></h2>
-<ul>
-<li>在Home页面被创建时，就应该获取菜单数据并附到左侧菜单框，因此created()生命钩子中调用this.getMenuList()</li>
-<li>模板区通过指令v-for循环赋值，每个v-for循环需要一个唯一的key值，通常用id</li>
-<li>el-submenu也需要唯一的一个index，否则相同的index会在一次展开时同时展开。通常也用index。注意此处index只接收字符串。</li>
-<li>一级菜单的index由item.id动态绑定，key也由item.id动态绑定，不同的是，前者需要拼接‘ ’来转换成字符串。</li>
-<li>二级菜单循环一级菜单的children属性，<strong>二级菜单的index由路由路径动态绑定</strong>，key仍然由item.id动态绑定。</li>
-</ul>
-<h2 id="实现首页的路由重定向"><strong>实现首页的路由重定向</strong></h2>
-<p>只要登录成功，我们默认访问/home，但是此时我们需要重定向到welcome地址，在主体区域展示Welcome组件。首先定义一个Welcome组件，然后在home页面主体区域放置一个路由占位符。然后将welcome路由设置为home理由的子路由规则，即可在home组件嵌套显示一个welcome的子组件。</p>
-<h2 id="左侧菜单改造为路由链接"><strong>左侧菜单改造为路由链接</strong></h2>
-<p>点击二级菜单时，跳转到对应的页面，因此二级菜单绑定单击响应事件。</p>
-<p>element-ui的NavMenu的属性中，有一项router，描述为：</p>
-<p>是否使用 vue-router 的模式，启用该模式会在激活导航时以 index 作为 path 进行路由跳转，类型为布尔值，默认为false。 :router=&quot;true&quot;表示为整个侧边栏开启路由模式。拿id作为跳转地址并不是很合适，最好是拿二级菜单的path属性作为跳转路径。</p>
-<h2 id="高亮效果"><strong>高亮效果</strong></h2>
-<p>NavMenu中的属性default-active说明：当前激活菜单的 index，类型为string。</p>
-<p>点击链接的时候把对应的path值（index）保存到sessionStorage中<br>
-当下一次刷新页面的时候，也就是home组件刚被创建的时候，就立即把值取出来，赋值给左侧菜单<br>
-给二级菜单绑定一个单击响应事件: 保存链接的激活状态</p>
-<pre><code class="language-jsx">saveNavState(activePath) {
-	window.sessionStorage.setItem('activePath', activePath)
-	this.activePath = activePath
-}
-</code></pre>
-<pre><code class="language-jsx">created() {
-    this.getMenuList()
-    this.activePath = window.sessionStorage.getItem('activePath')
-}
-</code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[登录/退出功能]]></title>
-        <id>https://shangxiaoyun.github.io/post/deng-lu-tui-chu-gong-neng/</id>
-        <link href="https://shangxiaoyun.github.io/post/deng-lu-tui-chu-gong-neng/">
-        </link>
-        <updated>2022-07-23T07:03:12.000Z</updated>
-        <content type="html"><![CDATA[<h1 id="登录业务流程">登录业务流程</h1>
-<p>登录业务流程</p>
-<p>1.在登录页面输入用户名和密码</p>
-<p>2.调用后台接口进行验证</p>
-<p>3.通过验证后，根据后台的响应状态跳转到项目主页</p>
-<h1 id="登录业务的相关技术点">登录业务的相关技术点</h1>
-<ul>
-<li>
-<p>登录业务的相关技术点</p>
-<ul>
-<li>http是无状态的</li>
-<li>通过cookie在客户端记录状态</li>
-<li>通过session在服务器端记录状态</li>
-<li>通过token方式维持状态</li>
-</ul>
-<p><strong>如果客户端和服务器存在跨域问题：token</strong></p>
-<p><strong>如果客户端和服务器不存在跨域问题：cookie+session</strong></p>
-</li>
-<li>
-<p>登录——token原理</p>
-</li>
-</ul>
-<figure data-type="image" tabindex="1"><img src="https://shangxiaoyun.github.io/post-images/1658562040637.png" alt="" loading="lazy"></figure>
-<h2 id="登录表单">登录表单</h2>
-<ul>
-<li>登录表单绑定数据对象，里面的内容和输入双向绑定（:model  v-model）</li>
-<li>增加表单验证规则(:rules prop)</li>
-<li>表单添加ref属性，通过this.$refs拿到表单引用，调用重置和登陆验证函数(resetFields()  validate())</li>
-<li>验证成功→配置axios和请求根路径，发起ajax请求  (this.$http)</li>
-<li>post结果是一个promise，用async await优化</li>
-</ul>
-<h2 id="登录成功以后">登录成功以后</h2>
-<ul>
-<li>1.将登陆成功之后的token保存到客户端的sessionStoreage中
-<ul>
-<li>1.1 项目中除了登陆以外的其他api接口（有权限的接口） ，必须在登陆以后才能访问</li>
-<li>1.2 token只应在当前网站打开期间生效，所以将token保存到<strong>sessionStoreage</strong>（会话期间存储机制，区别于localStoreage持久化的存储机制）中</li>
-</ul>
-</li>
-</ul>
-<pre><code class="language-jsx">window.sessionStorage.setItem('token', res.data.token)
-</code></pre>
-<ul>
-<li>2. 通过<strong>编程式导航</strong>跳转到后台主页，路由地址是/home</li>
-</ul>
-<pre><code class="language-jsx">this.$router.push(&quot;/home&quot;);
-</code></pre>
-<h3 id="用路由导航守卫控制导航权限">用路由导航守卫控制导航权限</h3>
-<p>如果用户没有登录，但通过url访问特定页面，需要重新导航到登录页面</p>
-<pre><code class="language-jsx">//挂载路由导航守卫
-router.beforeEach((to, from, next) =&gt; {
-  //to 将要访问的路径
-  //from 代表从哪个路径跳转而来
-  //next 是一个函数，表示放行
-  // next()  放行    next('/login)    强制跳转
-
-  if (to.path === '/login') return next();
-  //获取token
-  const tokenStr = window.sessionStorage.getItem('token');
-  if (!tokenStr) return next('/login');
-  next();
-})
-</code></pre>
-<h2 id="退出"><strong>退出</strong></h2>
-<p>消除本地token</p>
-<pre><code class="language-jsx">window.sessionStorage.clear()
 </code></pre>
 ]]></content>
     </entry>

@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://shangxiaoyun.github.io/favicon.ico?v=1660141148251">
+<link rel="shortcut icon" href="https://shangxiaoyun.github.io/favicon.ico?v=1660244802604">
 <link rel="stylesheet" href="https://shangxiaoyun.github.io/styles/main.css">
 
 
@@ -20,9 +20,9 @@
 
     <meta name="description" content="项目优化策略
 可以从以下几个方向优化：
-生成打包报告、第三方库启用CDN、Element-UI 组件按需加载、路由懒加载、图片压缩、图片懒加载、Gzip 压缩、首页内容定制等。
+生成打包报告、第三方库启用CDN、Element-UI 组件按需加载、路由懒加载、图片压缩、Gzip 压缩、首页内容定制等。
 生成打包报告
-便于直观发现项目存在的问题，由于项目使用 vue..." />
+便于直观发现项目存在的问题，由于项目使用 vue-cli2 ..." />
     <meta name="keywords" content="电商后台管理系统" />
   </head>
   <body>
@@ -32,7 +32,7 @@
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://shangxiaoyun.github.io">
-        <img src="https://shangxiaoyun.github.io/images/avatar.png?v=1660141148251" class="site-logo">
+        <img src="https://shangxiaoyun.github.io/images/avatar.png?v=1660244802604" class="site-logo">
         <h1 class="site-title">晓云的个人博客</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -94,7 +94,7 @@
             <div class="post-content" v-pre>
               <h2 id="项目优化策略"><strong>项目优化策略</strong></h2>
 <p>可以从以下几个方向优化：</p>
-<p>生成打包报告、第三方库启用CDN、Element-UI 组件按需加载、路由懒加载、图片压缩、图片懒加载、Gzip 压缩、首页内容定制等。</p>
+<p>生成打包报告、第三方库启用CDN、Element-UI 组件按需加载、路由懒加载、图片压缩、Gzip 压缩、首页内容定制等。</p>
 <h3 id="生成打包报告"><strong>生成打包报告</strong></h3>
 <p>便于直观发现项目存在的问题，由于项目使用 vue-cli2 ，此处通过可视化面板（vue ui）查看报告。</p>
 <h3 id="通过externals加载外部cdn资源"><strong>通过externals加载外部CDN资源</strong></h3>
@@ -166,65 +166,6 @@ const Welcome = () =&gt; import(/*webpackChunckName:&quot;Login_Home_Welcome&quo
 }
 </code></pre>
 <p>但是测试后上述设置对动态图片gif无效。</p>
-<h3 id="图片懒加载"><strong>图片懒加载</strong></h3>
-<ul>
-<li>
-<p>图片延迟加载也称为懒加载，延迟加载图片或符合某些条件时才加载某些图片，通常适用于图片较多的网页，可以减少请求数或延迟请求数，优化性能。它有三种常见的呈现方式：</p>
-<ul>
-<li>
-<p>延迟加载：使用 setTimeout 或 setInterval 进行延迟加载，如果用户在加载前就离开，自然不会进行加载。</p>
-</li>
-<li>
-<p>条件加载：符合某些条件或者触发某些条件才开始异步加载。</p>
-</li>
-<li>
-<p>可视域加载：仅仅加载用户可以看到的区域，主要通过监控滚动条来实现，一般距离用户看到的底边很近的时候加载，这样能保证用户下拉时正好接上，不会有太长时间的停顿。</p>
-<ul>
-<li>
-<p>判断条件：图片距顶部的距离 &lt; 滚动条顶部的距离 + 可视域区域高度</p>
-<ul>
-<li>
-<pre><code class="language-js">var clientHeight = document.documentElement.clientHeight;//  可视域区域高度	
-var scrollTop = document.documentElement.scrollTop;  // 滚动条 top 值
-imgTop = imgArr[i].offsetTop;
-/*...*/
-if(imgTop &lt; scrollTop + clientHeight){
-    var src = imgArr[i].getAttribute(&quot;data-src&quot;);
-	imgArr[i].setAttribute(&quot;src&quot;, src);   
-}
-</code></pre>
-</li>
-</ul>
-</li>
-<li>
-<p>判断时机：滚动的时候加载   window.onscroll</p>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>
-<p>上述方法，在滚动条上下滚动时，懒加载函数会被频繁调用，造成很大的性能损失，因此需要给事件加上节流 throttle。</p>
-<ul>
-<li>
-<pre><code class="language-js">function lazyload(fn, immediate) {
-    let flag = true;
-    return function (...args) {
-        let context = this;
-        if (!flag) return;
-        flag = false;
-        setTimeout(() =&gt; {
-            fn.apply(context, args)
-            flag = true;
-        }, 200)
-    }
-}
-</code></pre>
-</li>
-</ul>
-</li>
-</ul>
-<p>参考博客：<a href="https://blog.csdn.net/darabiuz/article/details/123151266">(18条消息) 图片懒加载的原理--三种方法实现_望屿的博客-CSDN博客_图片懒加载</a></p>
 <h3 id="gzip-压缩"><strong>Gzip 压缩</strong></h3>
 <p>Gzip 压缩使用到 CompressionWebpackPlugin 插件（文本资源压缩插件）。</p>
 <pre><code class="language-js">if (config.build.productionGzip) {
