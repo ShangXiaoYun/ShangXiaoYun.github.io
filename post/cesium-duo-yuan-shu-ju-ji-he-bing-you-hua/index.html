@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>标签列表 | 晓云的个人博客</title>
+<title>Cesium 多源数据集合并优化 | 晓云的个人博客</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,7 +18,8 @@
 
 
 
-    <meta name="description" content="一点记录">
+    <meta name="description" content="针对多颗拥有不同局部坐标系和边界体积的瓦片树难以合并，渲染多颗瓦片树乱序，以及多个缓存队列无法统一管理的问题，提出并实现了一种统一坐标系的合并瓦片索引方法，使得所有瓦片加载并渲染完毕的速率提升 15.49%。（最主要还是解决乱序问题，这里采..." />
+    <meta name="keywords" content="Cesium相关" />
   </head>
   <body>
     <div id="app" class="main">
@@ -82,18 +83,40 @@
 
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
-          <h2 class="tag-list-title">标签列表</h2>
-          <div class="tags-container">
+          <div class="post-detail">
+            <h2 class="post-title">Cesium 多源数据集合并优化</h2>
+            <div class="post-date">2022-08-12</div>
             
-              <a class="tag" href="https://shangxiaoyun.github.io/tag/fMQOCu-uZ/">Cesium相关</a>
+            <div class="post-content" v-pre>
+              <p>针对多颗拥有不同局部坐标系和边界体积的瓦片树难以合并，渲染多颗瓦片树乱序，以及多个缓存队列无法统一管理的问题，提出并实现了一种统一坐标系的合并瓦片索引方法，使得所有瓦片加载并渲染完毕的速率提升 15.49%。（最主要还是解决乱序问题，这里采取的数据量很小取了，选取的是65个tile，如果使用超过1000个Tile，并且认为操作页面进行移动，速率提升会更明显（帧率更高），此时缓存队列的作用才充分展现出来）。</p>
+<p>实现的过程中出现了很多问题，目前只做了包围盒为 box 格式的 transform 计算，还有 region 和 sphere 计算待完善，后续再填坑，包括计算公式和 Cesium 的缓存机制。</p>
+<p>效果视频：https://www.bilibili.com/video/bv1aB4y167ym?vd_source=1abeefe13381c97e3a10c86d239b6aa4</p>
+
+            </div>
             
-              <a class="tag" href="https://shangxiaoyun.github.io/tag/e249d7mAT/">js</a>
+              <div class="tag-container">
+                
+                  <a href="https://shangxiaoyun.github.io/tag/fMQOCu-uZ/" class="tag">
+                    Cesium相关
+                  </a>
+                
+              </div>
             
-              <a class="tag" href="https://shangxiaoyun.github.io/tag/RjiWSehJ7/">电商后台管理系统</a>
             
-              <a class="tag" href="https://shangxiaoyun.github.io/tag/8GNwgrS36/">前端性能相关</a>
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://shangxiaoyun.github.io/post/cesium-shu-ju-zu-zhi-you-hua/">
+                  <h3 class="post-title">
+                    Cesium 数据组织优化
+                  </h3>
+                </a>
+              </div>
             
+
+            
+
           </div>
+
         </div>
       </div>
     </div>

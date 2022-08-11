@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>标签列表 | 晓云的个人博客</title>
+<title>Cesium  内存管理优化 | 晓云的个人博客</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,7 +18,9 @@
 
 
 
-    <meta name="description" content="一点记录">
+    <meta name="description" content="针对加载大规模全景数据，数据量超过显卡内存，缓存链表无法及时卸载渲染瓦片，导致渲染报错的问题，提出一种考虑显卡内存容量的内存管理方法。
+主要解决报错问题，既然我们尽可能把多的瓦片树合并到一颗瓦片树上，那么对于海量数据，如香港数据，即使利用 ..." />
+    <meta name="keywords" content="Cesium相关" />
   </head>
   <body>
     <div id="app" class="main">
@@ -82,18 +84,41 @@
 
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
-          <h2 class="tag-list-title">标签列表</h2>
-          <div class="tags-container">
+          <div class="post-detail">
+            <h2 class="post-title">Cesium  内存管理优化</h2>
+            <div class="post-date">2022-08-12</div>
             
-              <a class="tag" href="https://shangxiaoyun.github.io/tag/fMQOCu-uZ/">Cesium相关</a>
+            <div class="post-content" v-pre>
+              <p>针对加载大规模全景数据，数据量超过显卡内存，缓存链表无法及时卸载渲染瓦片，导致渲染报错的问题，提出一种考虑显卡内存容量的内存管理方法。</p>
+<p>主要解决报错问题，既然我们尽可能把多的瓦片树合并到一颗瓦片树上，那么对于海量数据，如香港数据，即使利用 LOD 技术（视点越近，加载越精细的层级，视点越远，加载越粗糙的层级），在浏览全景时，仍旧会由于数据量超过显卡内存而报错。因此针对这种情况，改进现有内存管理方法。</p>
+<p>由于实验还有需要改进的地方，尚未录制对照视频，贴上实验图：</p>
+<figure data-type="image" tabindex="1"><img src="https://shangxiaoyun.github.io/post-images/1660247083272.png" alt="" loading="lazy"></figure>
+
+            </div>
             
-              <a class="tag" href="https://shangxiaoyun.github.io/tag/e249d7mAT/">js</a>
+              <div class="tag-container">
+                
+                  <a href="https://shangxiaoyun.github.io/tag/fMQOCu-uZ/" class="tag">
+                    Cesium相关
+                  </a>
+                
+              </div>
             
-              <a class="tag" href="https://shangxiaoyun.github.io/tag/RjiWSehJ7/">电商后台管理系统</a>
             
-              <a class="tag" href="https://shangxiaoyun.github.io/tag/8GNwgrS36/">前端性能相关</a>
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://shangxiaoyun.github.io/post/cesium-duo-yuan-shu-ju-ji-he-bing-you-hua/">
+                  <h3 class="post-title">
+                    Cesium 多源数据集合并优化
+                  </h3>
+                </a>
+              </div>
             
+
+            
+
           </div>
+
         </div>
       </div>
     </div>
